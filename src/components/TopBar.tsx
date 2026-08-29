@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import type { Settings } from '@/content'
+import ThemeToggle from '@/components/ThemeToggle'
 import MobileNav, { type NavSection } from '@/components/MobileNav'
 
 /** Far enough that a stray trackpad nudge doesn't flicker the background in. */
@@ -97,7 +98,10 @@ export default function TopBar({
           </button>
         )}
 
-        <div className="flex items-center gap-1 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* In the bar rather than the rail: the rail only exists on the home
+              page, so the control was unreachable everywhere else. */}
+          <ThemeToggle />
           <nav aria-label="Site" className="hidden items-center gap-4 sm:flex">
             <Link href="/work" className={navLink}>
               Work

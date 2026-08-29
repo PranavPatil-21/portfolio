@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import type { LayoutEntry, Settings } from '@/content'
 import Magnetic from '@/components/ui/Magnetic'
-import ThemeToggle from '@/components/ThemeToggle'
 
 const LABELS: Record<string, string> = {
   current: 'Current role',
@@ -203,8 +202,6 @@ export default function SideRail({
             Résumé
           </a>
         ) : null}
-
-        <ThemeToggle />
 
         <ul className="flex items-center gap-4">
           {socials.map((social) => (

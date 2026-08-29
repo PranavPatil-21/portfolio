@@ -76,7 +76,7 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var m=localStorage.getItem('theme')||'system';var d=m==='system'?(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):m;document.documentElement.dataset.theme=d;}catch(e){}})()`,
+            __html: `(function(){try{var s=localStorage.getItem('theme');var d=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=d;}catch(e){}})()`,
           }}
         />
       </head>

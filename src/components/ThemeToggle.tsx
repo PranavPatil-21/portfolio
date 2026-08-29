@@ -2,98 +2,104 @@
 
 import { useEffect, useState } from 'react'
 
-export type Mode = 'light' | 'dark' | 'system'
+export type Mode = 'light' | 'dark'
 
 const STORAGE_KEY = 'theme'
 
 /**
- * Resolves a mode to the attribute the stylesheet switches on.
+ * Reads and writes the stored preference defensively.
  *
- * Exported because the inline boot script in `layout.tsx` has to make the same
- * decision before React exists — if the two ever disagree, the page paints one
- * theme and then swaps to the other.
+ * `localStorage` is not always there: Safari in private mode can throw on
+ * access, and a partially-stubbed `window` in a test environment leaves it
+ * undefined. Neither should take the header down over a colour preference.
  */
-export function resolveTheme(mode: Mode): 'light' | 'dark' {
-  if (mode !== 'system') return mode
+function readStored(): string | null {
+  try {
+    return window.localStorage?.getItem(STORAGE_KEY) ?? null
+  } catch {
+    return null
+  }
+}
+
+function writeStored(value: string) {
+  try {
+    window.localStorage?.setItem(STORAGE_KEY, value)
+  } catch {
+    // A preference that cannot be persisted still applies for this visit.
+  }
+}
+
+/**
+ * Resolves the theme to paint.
+ *
+ * Exported because the inline boot script in `layout.tsx` makes the same
+ * decision before React exists — if the two disagree, the page paints one theme
+ * and visibly swaps to the other.
+ */
+export function resolveTheme(stored: string | null): Mode {
+  if (stored === 'light' || stored === 'dark') return stored
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'dark'
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
 }
 
-function apply(mode: Mode) {
-  document.documentElement.dataset.theme = resolveTheme(mode)
-}
-
 /**
- * Light / dark / system switch.
+ * Light / dark switch.
  *
- * Three states rather than two on purpose: a binary toggle silently overrides
- * the reader's operating-system preference the first time they touch it, and
- * gives them no way back. "System" is the default and stays reachable.
+ * Two states, not three. An explicit "system" option is more correct — it keeps
+ * the operating-system preference reachable after the reader has overridden it
+ * — but it is a third control for a benefit almost nobody reaches for, and the
+ * default already follows the system until the reader chooses otherwise.
  *
- * The choice persists in `localStorage`, read back by the boot script in
- * `layout.tsx` before first paint so the correct theme is painted once rather
- * than corrected afterwards.
+ * Until first use, no preference is stored and the OS decides. After it, the
+ * choice sticks; clearing site data returns to following the system.
  */
-export default function ThemeToggle() {
-  const [mode, setMode] = useState<Mode>('system')
+export default function ThemeToggle({ className = '' }: { className?: string }) {
+  const [mode, setMode] = useState<Mode>('dark')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    const stored = window.localStorage.getItem(STORAGE_KEY)
-    if (stored === 'light' || stored === 'dark' || stored === 'system') setMode(stored)
+    setMode(resolveTheme(readStored()))
   }, [])
 
-  // Follow the OS while the reader is on "system" — including if they change it
-  // in another window while this page is open.
+  // Keep following the OS while the reader has not chosen, including if they
+  // change it in another window with this page open.
   useEffect(() => {
-    if (!mounted || mode !== 'system' || typeof window.matchMedia !== 'function') return
+    if (!mounted || typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    if (readStored()) return
     const query = window.matchMedia('(prefers-color-scheme: light)')
-    const onChange = () => apply('system')
+    const onChange = () => {
+      const next: Mode = query.matches ? 'light' : 'dark'
+      setMode(next)
+      document.documentElement.dataset.theme = next
+    }
     query.addEventListener?.('change', onChange)
     return () => query.removeEventListener?.('change', onChange)
-  }, [mode, mounted])
+  }, [mounted])
 
-  const choose = (next: Mode) => {
+  const toggle = () => {
+    const next: Mode = mode === 'dark' ? 'light' : 'dark'
     setMode(next)
-    window.localStorage.setItem(STORAGE_KEY, next)
-    apply(next)
+    writeStored(next)
+    document.documentElement.dataset.theme = next
   }
 
-  const OPTIONS: { value: Mode; label: string; glyph: string }[] = [
-    { value: 'light', label: 'Light', glyph: '☀' },
-    { value: 'dark', label: 'Dark', glyph: '☾' },
-    { value: 'system', label: 'System', glyph: '◐' },
-  ]
+  // Before mount the stored preference is unknown. Rendering a definite icon
+  // and correcting it after hydration is a visible flicker, so the button is
+  // present but unlabelled until the answer is known.
+  const target = mode === 'dark' ? 'light' : 'dark'
 
   return (
-    <div
-      role="group"
-      aria-label="Colour theme"
-      className="inline-flex items-center gap-0.5 rounded-lg border border-[var(--hairline)] p-0.5"
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={mounted ? `Switch to ${target} theme` : 'Switch theme'}
+      title={mounted ? `Switch to ${target} theme` : 'Switch theme'}
+      className={`inline-flex size-8 items-center justify-center rounded-lg border border-[var(--hairline)] text-[var(--subtle)] transition-colors duration-200 hover:border-[var(--accent)] hover:text-[var(--foreground)] motion-reduce:transition-none ${className}`}
     >
-      {OPTIONS.map((option) => {
-        // Before mount the stored preference is unknown, so nothing is marked
-        // active — claiming one and correcting it is a visible flicker.
-        const active = mounted && mode === option.value
-        return (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => choose(option.value)}
-            aria-pressed={active}
-            title={option.label}
-            className={`rounded-md px-2 py-1 text-xs transition-colors duration-200 motion-reduce:transition-none ${
-              active
-                ? 'bg-[var(--accent-soft)] text-[var(--foreground)]'
-                : 'text-[var(--subtle)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            <span aria-hidden="true">{option.glyph}</span>
-            <span className="sr-only">{option.label}</span>
-          </button>
-        )
-      })}
-    </div>
+      <span aria-hidden="true" className="text-[13px] leading-none">
+        {mounted ? (mode === 'dark' ? '☀' : '☾') : '◐'}
+      </span>
+    </button>
   )
 }
