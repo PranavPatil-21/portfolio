@@ -30,7 +30,7 @@ import BlurText from '@/components/ui/BlurText'
  * reveals it) is the same animation and a far worse failure mode.
  */
 export default function Hero({ settings }: { settings: Settings }) {
-  const { name, roles, bio, location, email, resumePdf, socials, features, avatar } = settings
+  const { name, roles, bio, location, email, resumePdf, socials, features } = settings
 
   // The CMS clears a text field to `''`, not to nothing, so "set" has to mean
   // non-empty — otherwise clearing the field publishes a link to the site root.
@@ -53,8 +53,8 @@ export default function Hero({ settings }: { settings: Settings }) {
         a subject beside the copy rather than a wash behind it. On narrow
         screens it fills the section and the scrims below carry legibility.
       */}
-      <div className="absolute inset-0 lg:left-[34%]">
-        <HeroCanvas enabled={features.hero3d} image={avatar ?? '/uploads/profile.jpg'} />
+      <div className="absolute inset-0 lg:left-[38%]">
+        <HeroCanvas enabled={features.hero3d} />
       </div>
 
       {/*
@@ -94,13 +94,13 @@ export default function Hero({ settings }: { settings: Settings }) {
             >
               <span
                 aria-hidden="true"
-                className="hero-ghost ghost block text-4xl sm:text-5xl md:text-6xl"
+                className="hero-ghost ghost block text-[clamp(2.6rem,9.5vw,7.5rem)] leading-[0.9]"
               >
                 {GHOST_LINE}
               </span>
               <span
                 aria-hidden="true"
-                className="hero-name -mt-1 block text-[clamp(3.25rem,13vw,10rem)] text-[var(--foreground)] md:-mt-4"
+                className="hero-name -mt-[0.18em] block text-[clamp(3.25rem,13vw,10rem)] text-[var(--foreground)]"
                 style={{ perspective: '600px' }}
               >
                 {splitLetters(name).map((char, i) => (
