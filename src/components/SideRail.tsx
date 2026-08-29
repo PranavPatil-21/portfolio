@@ -54,7 +54,8 @@ export default function SideRail({
   layout: LayoutEntry[]
   emptyIds?: ReadonlySet<string>
 }) {
-  const { name, headline, bio, roles, location, email, resumePdf, socials } = settings
+  const { name, headline, bio, roles, location, email, resumePdf, socials, avatar, avatarAlt } =
+    settings
   const resumeHref = resumePdf?.trim() ? resumePdf : null
 
   const items = layout
@@ -103,7 +104,25 @@ export default function SideRail({
           </p>
         ) : null}
 
-        <h1 className="display text-[var(--foreground)]">{name}</h1>
+        <div className="flex items-center gap-4">
+          {/*
+            A face, at a size that establishes who is speaking without becoming
+            the subject. The accent ring ties it to the palette; `avatarAlt`
+            falls back to the name so the image is never unlabelled.
+          */}
+          {avatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatar}
+              alt={avatarAlt ?? name}
+              width={56}
+              height={56}
+              loading="eager"
+              className="size-14 shrink-0 rounded-full object-cover ring-1 ring-[var(--hairline)]"
+            />
+          ) : null}
+          <h1 className="display text-[var(--foreground)]">{name}</h1>
+        </div>
 
         <p className="mt-5 max-w-md text-[17px] leading-[1.5] text-pretty text-[var(--foreground)] md:text-lg">
           {parseEmphasis(positioning).map((part, i) =>

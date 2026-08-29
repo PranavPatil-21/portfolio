@@ -1,8 +1,9 @@
 ---
+category: systems
 title: Splitwise Backend Clone
 summary: An expense-management backend that settles a group's debts in the fewest possible transactions — expense splitting, debt simplification, settlements and balance reconciliation over REST APIs.
 date: 2023-04
-order: 3
+order: 9
 featured: true
 tech: [Java, Spring Boot, REST APIs, MySQL]
 repo: https://github.com/PranavPatil-21

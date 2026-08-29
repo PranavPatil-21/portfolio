@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent, within } from '@testing-library/react'
 
 // Vitest is not running with `globals: true`, so RTL's auto-cleanup hook never
 // registers. Without this, renders accumulate and every `getBy*` finds duplicates.
@@ -123,6 +123,9 @@ const projectFixture: Project[] = [
     featured: true,
     date: '2023-09',
     order: 1,
+    category: 'systems',
+    metrics: [],
+    flow: [],
   },
 ]
 
@@ -134,6 +137,9 @@ const projectWithoutLinks: Project[] = [
     body: '',
     tech: ['Java'],
     featured: false,
+    category: 'systems',
+    metrics: [],
+    flow: [],
     date: '2023-04',
     order: 2,
   },
@@ -263,6 +269,63 @@ describe('parseEmphasis', () => {
 
 // ---------------------------------------------------------------- Projects
 
+/**
+ * Three case studies across three categories, so the filter has something real
+ * to sort. Only the AI entry carries `metrics`, which lets one fixture prove
+ * both halves of the "figures render when present, absent when not" rule.
+ */
+const catalogueFixture: Project[] = [
+  {
+    slug: 'wiogenie',
+    title: 'WioGenie',
+    summary: 'A multi-agent incident investigator.',
+    body: '',
+    tech: ['Python'],
+    featured: true,
+    date: '2026-02',
+    order: 1,
+    category: 'ai',
+    role: 'Product and engineering lead',
+    decision: 'Ship the retrieval layer before the agent loop.',
+    metrics: [
+      { value: '70%', label: 'triage time saved' },
+      { value: '12', label: 'services covered' },
+    ],
+    flow: [],
+  },
+  {
+    slug: 'lending-billing-engine',
+    title: 'Lending Billing Engine',
+    summary: 'Kafka-based statement generation at 99% accuracy.',
+    body: '',
+    tech: ['Kafka'],
+    featured: false,
+    date: '2025-06',
+    order: 2,
+    category: 'systems',
+    metrics: [],
+    flow: [],
+  },
+  {
+    slug: 'fd-backed-sme-lending',
+    title: 'FD-Backed SME Lending',
+    summary: 'Secured credit journeys for SME customers.',
+    body: '',
+    tech: ['Java'],
+    featured: false,
+    date: '2025-09',
+    order: 3,
+    category: 'product',
+    metrics: [],
+    flow: [],
+  },
+]
+
+/** Titles of every card currently rendered, in document order. */
+function renderedTitles(): string[] {
+  return screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent ?? '')
+}
+
 describe('Projects', () => {
   it('renders the title, summary and tech of each project', () => {
     render(<Projects items={projectFixture} />)
@@ -345,6 +408,121 @@ describe('Projects', () => {
   it('returns null for an empty array', () => {
     const { container } = render(<Projects items={[]} />)
     expect(container).toBeEmptyDOMElement()
+  })
+
+  // ------------------------------------------------------ the case-study index
+
+  it('renders a card for every case study, whatever its category', () => {
+    render(<Projects items={catalogueFixture} />)
+    expect(renderedTitles()).toEqual([
+      'WioGenie',
+      'Lending Billing Engine',
+      'FD-Backed SME Lending',
+    ])
+  })
+
+  it('sorts featured work first, then by order', () => {
+    const shuffled = [catalogueFixture[2], catalogueFixture[1], catalogueFixture[0]]
+    render(<Projects items={shuffled} />)
+    // WioGenie is featured so it leads despite being last in the input array.
+    expect(renderedTitles()[0]).toBe('WioGenie')
+  })
+
+  it('renders a real button group of category filters, each with a live count', () => {
+    render(<Projects items={catalogueFixture} />)
+
+    const group = screen.getByRole('group', { name: /filter/i })
+    expect(within(group).getAllByRole('button')).toHaveLength(4)
+
+    expect(screen.getByRole('button', { name: /^All/ })).toBeInTheDocument()
+    expect(screen.getByTestId('filter-count-all')).toHaveTextContent('3')
+    expect(screen.getByTestId('filter-count-ai')).toHaveTextContent('1')
+    expect(screen.getByTestId('filter-count-systems')).toHaveTextContent('1')
+    expect(screen.getByTestId('filter-count-product')).toHaveTextContent('1')
+  })
+
+  it('filters the list to one category on click, and restores it with All', () => {
+    render(<Projects items={catalogueFixture} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /^AI/ }))
+    expect(renderedTitles()).toEqual(['WioGenie'])
+    expect(screen.queryByRole('heading', { level: 3, name: 'Lending Billing Engine' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: /^All/ }))
+    expect(renderedTitles()).toHaveLength(3)
+  })
+
+  it('tracks the active filter with aria-pressed', () => {
+    render(<Projects items={catalogueFixture} />)
+
+    const all = screen.getByRole('button', { name: /^All/ })
+    const systems = screen.getByRole('button', { name: /^Systems/ })
+
+    expect(all).toHaveAttribute('aria-pressed', 'true')
+    expect(systems).toHaveAttribute('aria-pressed', 'false')
+
+    fireEvent.click(systems)
+    expect(systems).toHaveAttribute('aria-pressed', 'true')
+    expect(all).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('announces the result count in a polite live region', () => {
+    render(<Projects items={catalogueFixture} />)
+
+    const status = screen.getByRole('status')
+    expect(status).toHaveTextContent(/3/)
+
+    fireEvent.click(screen.getByRole('button', { name: /^Product/ }))
+    expect(screen.getByRole('status')).toHaveTextContent(/1/)
+  })
+
+  it('says so when a category is empty rather than rendering a void', () => {
+    render(<Projects items={[catalogueFixture[0], catalogueFixture[1]]} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /^Product/ }))
+    expect(screen.queryAllByRole('heading', { level: 3 })).toHaveLength(0)
+    // The empty message lives inside the live region so it is announced, not
+    // just drawn.
+    expect(screen.getByRole('status')).toHaveTextContent(/no case studies/i)
+  })
+
+  it('labels each card with its category', () => {
+    render(<Projects items={catalogueFixture} />)
+    expect(screen.getByTestId('project-category-wiogenie')).toHaveTextContent(/^AI$/)
+    expect(screen.getByTestId('project-category-lending-billing-engine')).toHaveTextContent(
+      /^Systems$/,
+    )
+  })
+
+  it('links each case study to its detail page, with a discernible name', () => {
+    render(<Projects items={catalogueFixture} />)
+
+    const link = screen.getByRole('link', { name: /read case study.*WioGenie/i })
+    expect(link).toHaveAttribute('href', '/work/wiogenie')
+    expect(
+      screen.getByRole('link', { name: /read case study.*Lending Billing Engine/i }),
+    ).toHaveAttribute('href', '/work/lending-billing-engine')
+  })
+
+  it('omits the case-study link when the entry has no slug', () => {
+    render(<Projects items={[{ ...catalogueFixture[0], slug: '' }]} />)
+    expect(screen.queryByRole('link', { name: /read case study/i })).toBeNull()
+  })
+
+  it('renders metrics as figures when present, and nothing when not', () => {
+    render(<Projects items={catalogueFixture} />)
+
+    const metrics = screen.getByTestId('project-metrics-wiogenie')
+    expect(within(metrics).getByText('70%')).toBeInTheDocument()
+    expect(within(metrics).getByText('triage time saved')).toBeInTheDocument()
+    expect(within(metrics).getByText('12')).toBeInTheDocument()
+
+    expect(screen.queryByTestId('project-metrics-lending-billing-engine')).toBeNull()
+  })
+
+  it('prefers the structured decision field over an excerpt of the body', () => {
+    render(<Projects items={catalogueFixture} />)
+    expect(screen.getByText('Ship the retrieval layer before the agent loop.')).toBeInTheDocument()
   })
 })
 

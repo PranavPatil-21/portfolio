@@ -1,8 +1,9 @@
 ---
+category: systems
 title: AES Cryptosystem via Double Pendulum
 summary: An AES encryption system whose key generation is driven by double-pendulum chaos — trading a conventional entropy source for one that is trivially reproducible from a seed and practically unpredictable without it.
 date: 2023-09
-order: 2
+order: 8
 featured: true
 tech: [C++, Cryptography, AES, Chaos Theory]
 repo: https://github.com/PranavPatil-21

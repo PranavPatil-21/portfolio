@@ -501,6 +501,70 @@ collections:
         time_format: false
         picker_utc: true
         hint: Roughly when you built it. Used for sorting.
+      - name: category
+        label: Category
+        widget: select
+        options: [ai, systems, product]
+        default: systems
+        required: true
+        hint: Drives the filter on the home page. Pick the closest fit.
+
+      - name: role
+        label: Your role
+        widget: string
+        required: false
+        hint: What you actually did — e.g. "Architect and engineer".
+
+      - name: context
+        label: Context
+        widget: string
+        required: false
+        hint: Where it happened — e.g. "Wio Bank · SME credit".
+
+      - name: problem
+        label: The problem
+        widget: text
+        required: false
+        hint: What was broken or missing, and why it mattered.
+
+      - name: approach
+        label: The approach
+        widget: text
+        required: false
+        hint: What you built, briefly.
+
+      - name: decision
+        label: The decision
+        widget: text
+        required: false
+        hint: >-
+          The judgement call and the trade-off. This is the field hiring
+          managers read most closely — it shows how you think.
+
+      - name: outcome
+        label: The outcome
+        widget: text
+        required: false
+        hint: What changed, with a number where you have one.
+
+      - name: metrics
+        label: Headline figures
+        widget: list
+        required: false
+        label_singular: Figure
+        fields:
+          - { name: value, label: Figure, widget: string, required: true }
+          - { name: label, label: What it measures, widget: string, required: true }
+
+      - name: flow
+        label: System diagram
+        widget: list
+        required: false
+        field: { name: node, label: Step, widget: string, required: true }
+        hint: >-
+          Steps in order — e.g. Incident, Router agent, Citation check, Answer.
+          Two or more draws an animated pipeline; fewer draws nothing.
+
       - name: order
         label: Sort order
         widget: number

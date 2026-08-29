@@ -31,9 +31,9 @@
     }
   ],
   "theme": {
-    "accent": "#5b8def",
-    "background": "#0b0c0e",
-    "foreground": "#f2f4f7",
+    "accent": "#ff8c42",
+    "background": "#0c0a09",
+    "foreground": "#f5f2ef",
     "defaultMode": "dark"
   },
   "seo": {

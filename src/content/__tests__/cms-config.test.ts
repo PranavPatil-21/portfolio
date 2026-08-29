@@ -132,6 +132,23 @@ describe('every Zod-required field is offered by the CMS', () => {
     expect(unknown, `${name} offers fields the schema does not define`).toEqual([])
   })
 
+  /*
+   * The reverse direction, and the one that actually bites.
+   *
+   * The check above catches a CMS field the schema would strip. It does NOT
+   * catch a schema field the CMS never exposes — that drift is silent, and its
+   * consequence is a field the owner simply cannot edit, which quietly breaks
+   * the promise the whole architecture exists to keep. Adding a field to
+   * `schemas.ts` and forgetting `config.yml` must fail here.
+   */
+  it.each(cases)('%s: every schema field is editable from the admin', (name, schema, fields) => {
+    const offered = fieldNames(fields)
+    const unexposed = Object.keys(schema.shape)
+      .filter((k) => !LOADER_SUPPLIED.has(k))
+      .filter((k) => !offered.has(k))
+    expect(unexposed, `${name} has schema fields the CMS cannot edit`).toEqual([])
+  })
+
   it.each(cases)('%s: never exposes slug, which the loader derives', (name, _schema, fields) => {
     const exposed = [...fieldNames(fields)].filter((f) => LOADER_SUPPLIED.has(f))
     expect(exposed, `${name} must not let the CMS set the slug`).toEqual([])

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getNativeArticles } from '@/content'
+import { getNativeArticles, getProjects } from '@/content'
 
 /**
  * The absolute origin the site is served from. Read from the environment so the
@@ -25,6 +25,7 @@ function lastModified(date: string): Date | undefined {
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl()
   const articles = getNativeArticles()
+  const projects = getProjects()
 
   return [
     { url: `${base}/`, changeFrequency: 'weekly', priority: 1 },
@@ -34,6 +35,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: lastModified(a.date),
       changeFrequency: 'yearly' as const,
       priority: 0.6,
+    })),
+    { url: `${base}/work`, changeFrequency: 'weekly' as const, priority: 0.9 },
+    ...projects.map((p) => ({
+      url: `${base}/work/${p.slug}`,
+      lastModified: lastModified(p.date),
+      changeFrequency: 'yearly' as const,
+      priority: 0.7,
     })),
   ]
 }

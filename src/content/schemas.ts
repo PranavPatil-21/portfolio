@@ -132,6 +132,30 @@ export const experienceSchema = z.object({
   body: z.string().default(''),
 })
 
+/**
+ * A headline impact figure — "800K+" / "monthly events processed".
+ *
+ * `value` is a free string rather than a number because the interesting part is
+ * usually the notation: `99%`, `800K+`, `<1%`, `3s → 1s`. The counter parses
+ * the digits out of it and animates those, preserving whatever surrounds them.
+ */
+export const metricSchema = z.object({
+  value: z.string().min(1),
+  label: z.string().min(1),
+})
+
+export const metricsSchema = z.object({
+  items: z.array(metricSchema).default([]),
+})
+
+/**
+ * A piece of work, told as a case study.
+ *
+ * The structured fields exist because a recruiter for a product role reads for
+ * a specific shape — what was broken, what you decided, what changed — and a
+ * free-text blob makes them hunt for it. Each is optional so a lightweight
+ * entry stays lightweight.
+ */
 export const projectSchema = z.object({
   slug: z.string().default(''),
   title: z.string().min(1),
@@ -145,6 +169,26 @@ export const projectSchema = z.object({
   featured: z.boolean().default(false),
   date: dateish,
   order: orderField,
+
+  /** Drives the case-study filter. */
+  category: z.enum(['ai', 'systems', 'product']).default('systems'),
+  /** What he actually did on it — important when the work was in a team. */
+  role: optionalish(z.string()),
+  context: optionalish(z.string()),
+
+  problem: optionalish(z.string()),
+  approach: optionalish(z.string()),
+  decision: optionalish(z.string()),
+  outcome: optionalish(z.string()),
+
+  /** Headline figures for this piece of work specifically. */
+  metrics: z.array(metricSchema).default([]),
+  /**
+   * Nodes of a system diagram, in order — e.g. ["API", "Kafka", "Processor"].
+   * Rendered as an animated flow. A list of strings rather than a graph so it
+   * stays editable in a CMS by someone who is not drawing boxes.
+   */
+  flow: stringList(),
 })
 
 export const articleSchema = z.object({
@@ -216,21 +260,6 @@ export const customSectionSchema = z.object({
   body: z.string().default(''),
 })
 
-/**
- * A headline impact figure — "800K+" / "monthly events processed".
- *
- * `value` is a free string rather than a number because the interesting part is
- * usually the notation: `99%`, `800K+`, `<1%`, `3s → 1s`. The counter parses
- * the digits out of it and animates those, preserving whatever surrounds them.
- */
-export const metricSchema = z.object({
-  value: z.string().min(1),
-  label: z.string().min(1),
-})
-
-export const metricsSchema = z.object({
-  items: z.array(metricSchema).default([]),
-})
 
 export const layoutEntrySchema = z.object({
   sectionId: z.string().min(1),

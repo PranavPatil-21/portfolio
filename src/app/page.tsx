@@ -14,6 +14,8 @@ import { fetchMediumArticles } from '@/lib/medium'
 import Footer from '@/components/Footer'
 import SideRail from '@/components/SideRail'
 import Spotlight from '@/components/Spotlight'
+import ScrollProgress from '@/components/ScrollProgress'
+import CommandPalette, { type CommandItem } from '@/components/CommandPalette'
 import SectionRenderer from '@/components/SectionRenderer'
 
 /**
@@ -69,10 +71,70 @@ export default async function Home() {
     if (!section.items.length) emptyIds.add(`custom:${section.slug}`)
   }
 
+  /*
+   * Everything the palette can jump to: the sections that actually render, then
+   * every case study, then the outbound links. Built here rather than inside the
+   * palette so it stays a dumb, testable component and the page keeps ownership
+   * of what exists.
+   */
+  const SECTION_LABELS: Record<string, string> = {
+    current: 'Current role',
+    metrics: 'Impact',
+    experience: 'Experience',
+    projects: 'Case studies',
+    skills: 'Skills',
+    articles: 'Writing',
+    education: 'Education',
+    responsibilities: 'Leadership',
+    contact: 'Contact',
+  }
+
+  const commandItems: CommandItem[] = [
+    ...layout
+      .filter((e) => e.visible && e.sectionId !== 'hero' && !emptyIds.has(e.sectionId))
+      .flatMap((e) => {
+        const label = SECTION_LABELS[e.sectionId] ?? customTitles.get(e.sectionId)
+        return label
+          ? [{ id: e.sectionId, label, group: 'Sections', href: `#${e.sectionId}` }]
+          : []
+      }),
+    ...projects.map((project) => ({
+      id: `work-${project.slug}`,
+      label: project.title,
+      group: 'Case studies',
+      href: `/work/${project.slug}`,
+    })),
+    {
+      id: 'email',
+      label: `Email ${settings.name}`,
+      group: 'Contact',
+      href: `mailto:${settings.email}`,
+    },
+    ...(settings.resumePdf
+      ? [
+          {
+            id: 'resume',
+            label: 'Download résumé',
+            group: 'Contact',
+            href: settings.resumePdf,
+          },
+        ]
+      : []),
+    ...settings.socials
+      .filter((social) => !social.url.startsWith('mailto:'))
+      .map((social) => ({
+        id: `social-${social.label}`,
+        label: social.label,
+        group: 'Elsewhere',
+        href: social.url,
+      })),
+  ]
+
   return (
     <>
-
+      <ScrollProgress />
       <Spotlight />
+      <CommandPalette items={commandItems} />
 
       {/*
         The split layout: identity and navigation stay put on the left while the
