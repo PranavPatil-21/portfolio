@@ -1,16 +1,23 @@
 ---
 title: Splitwise Backend Clone
-summary: A scalable expense-management backend supporting accurate expense splitting, debt simplification, settlements and balance reconciliation over REST APIs.
+summary: An expense-management backend that settles a group's debts in the fewest possible transactions — expense splitting, debt simplification, settlements and balance reconciliation over REST APIs.
 date: 2023-04
-order: 2
+order: 3
 featured: true
 tech: [Java, Spring Boot, REST APIs, MySQL]
 repo: https://github.com/PranavPatil-21
 ---
 
-Developed a scalable expense management backend supporting accurate expense
-splitting, debt simplification, settlements, and balance reconciliation via
-RESTful APIs.
+## The problem
 
-The interesting part is debt simplification — reducing a dense graph of who owes
-whom into the minimum number of transactions that settle every balance.
+Splitting a bill is arithmetic. Settling a group is not. After a few weeks of
+shared expenses, a group holds a dense graph of who owes whom, and paying it
+off edge by edge means far more transfers than anyone actually needs to make.
+
+## The decision
+
+Treat settlement as a graph reduction rather than a ledger replay: collapse the
+web of pairwise debts into the minimum number of transactions that leave every
+balance at zero. The rest of the system — splitting, settlements, balance
+reconciliation over REST APIs — exists to keep that graph accurate enough for
+the reduction to be trusted.

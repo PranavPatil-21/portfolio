@@ -95,6 +95,7 @@ describe('file collections point at files the loader reads', () => {
     ['settings', 'content/settings.json'],
     ['layout', 'content/layout.json'],
     ['skills', 'content/skills.json'],
+    ['metrics', 'content/metrics.json'],
   ])('%s → %s', (name, file) => {
     const c = collections.get(name)
     expect(c, `collection "${name}" is missing from config.yml`).toBeTruthy()

@@ -1,15 +1,21 @@
 import type { ReactNode } from 'react'
 
-type TagProps = {
+/**
+ * A small metadata pill — tech, tags, categories.
+ *
+ * Mono and low-contrast on purpose: tags are supporting evidence, and a wall of
+ * them competing with a heading is what makes a portfolio read as a CV dump.
+ */
+export function Tag({
+  children,
+  className = '',
+}: {
   children: ReactNode
   className?: string
-}
-
-/** A small pill for a technology, topic or category. */
-export function Tag({ children, className = '' }: TagProps) {
+}) {
   return (
     <span
-      className={`inline-flex items-center rounded-full border border-hairline bg-surface-strong px-3 py-1 text-xs font-medium tracking-wide text-muted transition-colors hover:border-accent/50 hover:text-foreground ${className}`.trim()}
+      className={`rounded-full border border-[var(--hairline)] px-3 py-1 font-mono text-[11px] tracking-wide text-[var(--foreground)]/55 ${className}`}
     >
       {children}
     </span>

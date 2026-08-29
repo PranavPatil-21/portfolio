@@ -1,49 +1,61 @@
 import type { ReactNode } from 'react'
 
-type SectionShellProps = {
-  /** Anchor target — must match the `sectionId` in `content/layout.json`. */
-  id: string
-  title: string
-  subtitle?: string
-  children: ReactNode
-  className?: string
-}
-
 /**
- * The frame every section on the page shares: a semantic `<section>` carrying
- * the anchor id, a real `<h2>` (so the document outline is navigable by screen
- * reader and legible to a crawler), and a scroll margin so in-page navigation
- * does not park the heading under the sticky nav.
+ * The frame every section sits in.
+ *
+ * The heading is a pair: an outlined italic serif phrase followed by a heavy
+ * sans one. Two voices in one line is the core typographic move of this design
+ * — it keeps very large headings from reading as shouting.
+ *
+ * `title` is the solid half and `eyebrow` the outlined half; both come from
+ * content, so the pairing survives the owner renaming a section.
  */
 export function SectionShell({
   id,
   title,
   subtitle,
+  eyebrow,
+  index,
   children,
-  className = '',
-}: SectionShellProps) {
+}: {
+  id: string
+  title: string
+  subtitle?: string
+  eyebrow?: string
+  index?: string
+  children: ReactNode
+}) {
+  const headingId = `${id}-heading`
+
   return (
     <section
       id={id}
-      aria-labelledby={`${id}-heading`}
-      className={`scroll-mt-24 py-20 sm:py-28 ${className}`.trim()}
+      aria-labelledby={headingId}
+      className="relative scroll-mt-24 px-6 py-24 sm:px-10 md:py-36"
     >
-      <div className="mx-auto w-full max-w-5xl px-6">
-        <header className="mb-10 max-w-2xl">
+      <div className="mx-auto w-full max-w-6xl">
+        <header className="mb-14 md:mb-20">
+          {index ? (
+            <p className="mb-5 font-mono text-[10px] tracking-[0.35em] text-[var(--foreground)]/55 uppercase">
+              {index}
+            </p>
+          ) : null}
+
           <h2
-            id={`${id}-heading`}
-            className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
+            id={headingId}
+            className="flex flex-col text-5xl leading-[0.85] font-black tracking-tighter sm:text-7xl md:text-8xl"
           >
-            <span className="bg-gradient-to-r from-foreground to-accent bg-clip-text text-transparent">
-              {title}
-            </span>
+            {eyebrow ? <span className="ghost block">{eyebrow}</span> : null}
+            <span className="-mt-1 block md:-mt-3">{title}</span>
           </h2>
-          {subtitle ? <p className="mt-3 text-base text-muted">{subtitle}</p> : null}
-          <span
-            aria-hidden="true"
-            className="mt-5 block h-px w-24 bg-gradient-to-r from-accent to-transparent"
-          />
+
+          {subtitle ? (
+            <p className="mt-7 max-w-xl text-sm leading-relaxed text-[var(--foreground)]/60">
+              {subtitle}
+            </p>
+          ) : null}
         </header>
+
         {children}
       </div>
     </section>

@@ -1,19 +1,16 @@
 import type { ReactNode } from 'react'
 
-type CardProps = {
+/** A surface. Border-led rather than fill-led, so it reads on near-black. */
+export function Card({
+  children,
+  className = '',
+}: {
   children: ReactNode
   className?: string
-}
-
-/**
- * The site's one surface treatment: a glass panel that sits above the page
- * gradient. Every section reuses it so custom sections (§5.3) inherit the
- * visual language for free.
- */
-export function Card({ children, className = '' }: CardProps) {
+}) {
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border border-hairline bg-surface p-6 shadow-glass backdrop-blur-xl transition duration-300 hover:border-accent/40 hover:shadow-glow ${className}`.trim()}
+      className={`rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] backdrop-blur-sm transition duration-500 hover:border-[color-mix(in_oklab,var(--accent)_45%,transparent)] motion-reduce:transition-none ${className}`}
     >
       {children}
     </div>

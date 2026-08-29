@@ -176,8 +176,85 @@ describe('CustomSection', () => {
     expect(screen.getByText('observability')).toBeInTheDocument()
   })
 
+  it.each(layouts)('renders the item date (%s)', (layout) => {
+    render(
+      <CustomSection section={section({ layout, items: [item({ date: '2026-04-12' })] })} />,
+    )
+    expect(screen.getByText('2026-04-12')).toBeInTheDocument()
+  })
+
   it('renders the section body as a subtitle when present', () => {
     render(<CustomSection section={section({ body: 'Places I have spoken.' })} />)
     expect(screen.getByText('Places I have spoken.')).toBeInTheDocument()
+  })
+})
+
+/**
+ * The owner chooses between these four from the CMS. If two of them ever
+ * collapsed into the same shape that choice would silently stop meaning
+ * anything, and nothing else in the suite would notice — every other assertion
+ * here is about content, which all four render identically by design.
+ *
+ * So pin the *structure*: each layout has one signature element the other three
+ * do not have.
+ */
+describe('custom layouts stay structurally distinct', () => {
+  function renderLayout(layout: (typeof layouts)[number]) {
+    return render(
+      <CustomSection
+        section={section({ layout, items: [item({ title: 'First' }), item({ title: 'Second' })] })}
+      />,
+    )
+  }
+
+  it('cards is the surface grid — one Card per item, no rail, no figure', () => {
+    const { container } = renderLayout('cards')
+    expect(screen.getAllByTestId('card')).toHaveLength(2)
+    expect(container.querySelector('ol')).toBeNull()
+    expect(container.querySelector('figure')).toBeNull()
+  })
+
+  it('timeline is the ordered rail — an <ol>, no Card surfaces, no figure', () => {
+    const { container } = renderLayout('timeline')
+    expect(container.querySelector('ol')).not.toBeNull()
+    expect(screen.queryAllByTestId('card')).toHaveLength(0)
+    expect(container.querySelector('figure')).toBeNull()
+  })
+
+  it('logo-grid is the tile wall — a <figure> per item, no rail, no Card surfaces', () => {
+    const { container } = renderLayout('logo-grid')
+    expect(container.querySelectorAll('figure')).toHaveLength(2)
+    expect(container.querySelector('ol')).toBeNull()
+    expect(screen.queryAllByTestId('card')).toHaveLength(0)
+  })
+
+  it('list is the flat register — no Card surface, no rail, no figure', () => {
+    const { container } = renderLayout('list')
+    expect(screen.queryAllByTestId('card')).toHaveLength(0)
+    expect(container.querySelector('ol')).toBeNull()
+    expect(container.querySelector('figure')).toBeNull()
+    // still a list of rows, just an unordered one
+    expect(container.querySelectorAll('li')).toHaveLength(2)
+  })
+
+  it('renders a title-only item in every layout without crashing', () => {
+    for (const layout of layouts) {
+      const { unmount } = render(
+        <CustomSection
+          section={section({
+            layout,
+            items: [
+              {
+                title: 'Bare item',
+                tags: [],
+                links: [],
+              } as CustomItem,
+            ],
+          })}
+        />,
+      )
+      expect(screen.getByText('Bare item')).toBeInTheDocument()
+      unmount()
+    }
   })
 })

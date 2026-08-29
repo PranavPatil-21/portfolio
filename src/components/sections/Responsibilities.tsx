@@ -1,11 +1,13 @@
 import { SectionShell } from '@/components/ui/SectionShell'
-import { Timeline, TimelineItem, TimelineBullets, formatRange } from './Experience'
+import { CredentialList, CredentialRow, formatRange } from './Education'
 import type { Responsibility } from '@/content/schemas'
 
 /**
- * Positions of responsibility — societies, committees, student bodies. Same
- * rail as Experience and Education. `organisation` is the British spelling the
- * frozen schema uses; do not "correct" it.
+ * Positions of responsibility — societies, committees, student bodies.
+ *
+ * Shares Education's quiet credential rail rather than Experience's headline
+ * timeline: this is corroboration, and it should read that way. `organisation`
+ * is the British spelling the frozen schema uses; do not "correct" it.
  */
 export function Responsibilities({ items }: { items: Responsibility[] }) {
   if (items.length === 0) return null
@@ -13,23 +15,24 @@ export function Responsibilities({ items }: { items: Responsibility[] }) {
   return (
     <SectionShell
       id="responsibilities"
+      index="07 / RESPONSIBILITIES"
+      eyebrow="Leading"
       title="Responsibilities"
-      subtitle="Teams I have led and events I have run."
+      subtitle="Teams I have led and rooms I have been accountable in."
     >
-      <Timeline>
+      <CredentialList>
         {items.map((item, i) => (
-          <TimelineItem
+          <CredentialRow
             key={item.slug || `${item.organisation}-${item.start}`}
+            period={formatRange(item.start, item.end)}
             heading={item.role}
             subheading={item.organisation}
             meta={item.location || undefined}
-            period={formatRange(item.start, item.end)}
+            bullets={item.bullets}
             delay={i * 0.06}
-          >
-            <TimelineBullets bullets={item.bullets} />
-          </TimelineItem>
+          />
         ))}
-      </Timeline>
+      </CredentialList>
     </SectionShell>
   )
 }

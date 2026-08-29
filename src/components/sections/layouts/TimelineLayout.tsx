@@ -3,29 +3,35 @@ import { Tag } from '@/components/ui/Tag'
 import { Reveal } from '@/components/ui/Reveal'
 
 /**
- * A vertical rail with a marker per item. Best for anything chronological
+ * A vertical rail with an accent node per item. Best for anything chronological
  * (Awards, Certifications) where the date carries as much meaning as the title.
+ *
+ * The `<ol>` is the structural signature of this layout — it is what makes it
+ * distinguishable from the list layout, which is otherwise the nearest sibling.
  */
 export function TimelineLayout({ items }: CustomLayoutProps) {
   return (
-    <ol className="relative list-none border-l border-current/15 p-0 pl-6 sm:pl-8">
+    <ol className="relative ml-1 list-none border-l border-[var(--hairline)] p-0">
       {items.map((item, index) => (
-        <li key={`${item.title}-${index}`} className="relative pb-8 last:pb-0">
-          <Reveal delay={index * 0.06}>
-            <span
-              aria-hidden="true"
-              className="absolute -left-[1.6875rem] top-2 h-3 w-3 rounded-full border-2 border-current/40 bg-current/10 sm:-left-[2.1875rem]"
-            />
+        <li key={`${item.title}-${index}`} className="relative pb-12 pl-8 last:pb-0 sm:pl-10">
+          <span
+            aria-hidden="true"
+            className="absolute top-2 left-0 h-3 w-3 -translate-x-1/2 rounded-full border border-[var(--accent)] bg-[var(--background)]"
+          />
 
+          <Reveal delay={index * 0.06}>
             {item.date ? (
-              <p className="font-mono text-xs uppercase tracking-widest text-current/50">
+              <p className="font-mono text-[10px] tracking-[0.35em] text-[var(--accent-readable)] uppercase">
                 {item.date}
               </p>
             ) : null}
 
-            <h3 className="mt-1 text-base font-semibold leading-snug">{item.title}</h3>
+            <h3 className="mt-3 text-lg leading-snug font-semibold tracking-tight text-[var(--foreground)] sm:text-xl">
+              {item.title}
+            </h3>
+
             {item.subtitle ? (
-              <p className="text-sm text-current/70">{item.subtitle}</p>
+              <p className="mt-2 text-sm text-[var(--foreground)]/60">{item.subtitle}</p>
             ) : null}
 
             {item.image ? (
@@ -33,18 +39,18 @@ export function TimelineLayout({ items }: CustomLayoutProps) {
                 src={item.image}
                 alt={item.imageAlt ?? ''}
                 loading="lazy"
-                className="mt-3 h-16 w-auto max-w-full rounded-md object-contain"
+                className="mt-4 h-16 w-auto max-w-full rounded-lg object-contain"
               />
             ) : null}
 
             {item.description ? (
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-current/80">
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--foreground)]/60">
                 {item.description}
               </p>
             ) : null}
 
             {item.tags.length > 0 ? (
-              <ul className="mt-3 flex list-none flex-wrap gap-2 p-0">
+              <ul className="mt-5 flex list-none flex-wrap gap-2 p-0">
                 {item.tags.map((tag) => (
                   <li key={tag}>
                     <Tag>{tag}</Tag>
@@ -54,12 +60,12 @@ export function TimelineLayout({ items }: CustomLayoutProps) {
             ) : null}
 
             {item.links.length > 0 ? (
-              <ul className="mt-3 flex list-none flex-wrap gap-4 p-0">
+              <ul className="mt-5 flex list-none flex-wrap gap-x-6 gap-y-2 p-0">
                 {item.links.map((link) => (
                   <li key={link.url}>
                     <a
                       href={link.url}
-                      className="text-sm font-medium underline-offset-4 transition-colors hover:underline motion-reduce:transition-none"
+                      className="font-mono text-[10px] tracking-[0.28em] text-[var(--accent-readable)] uppercase underline-offset-8 transition-colors duration-300 hover:underline motion-reduce:transition-none"
                     >
                       {link.label}
                     </a>

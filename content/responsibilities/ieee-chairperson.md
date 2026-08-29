@@ -6,5 +6,5 @@ start: 2022-12
 end: 2024-05
 order: 1
 bullets:
-  - Led a 25+ member team and organized large-scale technical events generating 25L+ in revenue.
+  - "Ran the technical society as a *25+* person team, delivering large-scale events that generated *25L+* in revenue."
 ---

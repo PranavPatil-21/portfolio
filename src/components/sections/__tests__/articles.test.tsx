@@ -127,6 +127,39 @@ describe('<Articles />', () => {
     expect(screen.getByText('testing')).toBeInTheDocument()
   })
 
+  it('does not label an internally hosted article as hosted elsewhere', () => {
+    render(<Articles items={[article()]} />)
+    expect(screen.queryByText(/hosted on medium/i)).not.toBeInTheDocument()
+  })
+
+  it('renders the date as a machine-readable <time>', () => {
+    const { container } = render(<Articles items={[article({ date: '2026-08-01' })]} />)
+    expect(container.querySelector('time')).toHaveAttribute('datetime', '2026-08-01')
+  })
+
+  it('gives each article exactly one link, so the read cue is not a second tab stop', () => {
+    render(<Articles items={[article()]} />)
+    // the article title, plus the "all articles" link
+    expect(screen.getAllByRole('link')).toHaveLength(2)
+    expect(screen.queryByRole('link', { name: /read article/i })).not.toBeInTheDocument()
+  })
+
+  it('shows only the most recent `limit` articles', () => {
+    render(
+      <Articles
+        limit={2}
+        items={[
+          article({ slug: 'a', title: 'First' }),
+          article({ slug: 'b', title: 'Second' }),
+          article({ slug: 'c', title: 'Third' }),
+        ]}
+      />,
+    )
+    expect(screen.getByText('First')).toBeInTheDocument()
+    expect(screen.getByText('Second')).toBeInTheDocument()
+    expect(screen.queryByText('Third')).not.toBeInTheDocument()
+  })
+
   it('renders a link to the full article index', () => {
     render(<Articles items={[article()]} />)
     expect(screen.getByRole('link', { name: /all articles/i })).toHaveAttribute('href', '/articles')

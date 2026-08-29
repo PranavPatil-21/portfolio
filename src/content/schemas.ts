@@ -209,6 +209,22 @@ export const customSectionSchema = z.object({
   body: z.string().default(''),
 })
 
+/**
+ * A headline impact figure — "800K+" / "monthly events processed".
+ *
+ * `value` is a free string rather than a number because the interesting part is
+ * usually the notation: `99%`, `800K+`, `<1%`, `3s → 1s`. The counter parses
+ * the digits out of it and animates those, preserving whatever surrounds them.
+ */
+export const metricSchema = z.object({
+  value: z.string().min(1),
+  label: z.string().min(1),
+})
+
+export const metricsSchema = z.object({
+  items: z.array(metricSchema).default([]),
+})
+
 export const layoutEntrySchema = z.object({
   sectionId: z.string().min(1),
   visible: z.boolean().default(true),
@@ -228,5 +244,6 @@ export type Education = z.infer<typeof educationSchema>
 export type Responsibility = z.infer<typeof responsibilitySchema>
 export type CustomItem = z.infer<typeof customItemSchema>
 export type CustomSection = z.infer<typeof customSectionSchema>
+export type Metric = z.infer<typeof metricSchema>
 export type LayoutEntry = z.infer<typeof layoutEntrySchema>
 export type Link = z.infer<typeof linkSchema>

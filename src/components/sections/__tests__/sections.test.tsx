@@ -64,9 +64,10 @@ vi.mock('@/components/ui/Reveal', () => {
   return { Reveal, default: Reveal }
 })
 
-import { Experience } from '../Experience'
+import { Experience, parseEmphasis } from '../Experience'
 import { Projects } from '../Projects'
 import { Skills } from '../Skills'
+import { Metrics, parseMetric } from '../Metrics'
 import { Education } from '../Education'
 import { Responsibilities } from '../Responsibilities'
 import { Contact } from '../Contact'
@@ -81,7 +82,10 @@ const experienceFixture: ExperienceItem[] = [
     location: 'Gurugram, India',
     start: '2024-09',
     current: true,
-    bullets: ['Architected a Kafka-based lending billing engine.'],
+    bullets: [
+      'Architected a Kafka-based lending billing engine.',
+      'Cut settlement latency by *40% across 800K daily events*, unblocking same-day payouts.',
+    ],
     tech: ['Java', 'Kafka'],
     order: 1,
     body: '',
@@ -189,11 +193,13 @@ const baseSettings: Settings = {
 // ---------------------------------------------------------------- Experience
 
 describe('Experience', () => {
-  it('renders each role, company and bullet', () => {
+  it('leads with the company, keeps the role, and renders every bullet', () => {
     render(<Experience items={experienceFixture} />)
     expect(screen.getByRole('heading', { level: 2, name: /experience/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 3, name: /^Software Engineer$/ })).toBeInTheDocument()
-    expect(screen.getAllByText('Wio Bank PJSC').length).toBe(2)
+    // The company is the loud element in the cinematic timeline; the role is
+    // the supporting line beneath it.
+    expect(screen.getAllByRole('heading', { level: 3, name: 'Wio Bank PJSC' }).length).toBe(2)
+    expect(screen.getByText('Software Engineer')).toBeInTheDocument()
     expect(
       screen.getByText('Architected a Kafka-based lending billing engine.'),
     ).toBeInTheDocument()
@@ -205,9 +211,46 @@ describe('Experience', () => {
     expect(screen.getByText(/Feb 2024 — Aug 2024/)).toBeInTheDocument()
   })
 
+  it('renders *asterisk* emphasis as an accent span with the asterisks stripped', () => {
+    render(<Experience items={experienceFixture} />)
+
+    const emphasised = screen.getByText('40% across 800K daily events')
+    expect(emphasised.tagName).toBe('SPAN')
+    expect(emphasised.className).toContain('accent-readable')
+
+    // The bullet reads as one uninterrupted sentence, asterisks gone.
+    const bullet = emphasised.closest('li')
+    expect(bullet?.textContent).toBe(
+      'Cut settlement latency by 40% across 800K daily events, unblocking same-day payouts.',
+    )
+    expect(bullet?.textContent).not.toContain('*')
+  })
+
+  it('renders the tech stack as secondary tags', () => {
+    render(<Experience items={experienceFixture} />)
+    expect(screen.getByText('Kafka')).toBeInTheDocument()
+  })
+
   it('returns null for an empty array', () => {
     const { container } = render(<Experience items={[]} />)
     expect(container).toBeEmptyDOMElement()
+  })
+})
+
+describe('parseEmphasis', () => {
+  it('splits a string into plain and emphasised segments', () => {
+    expect(parseEmphasis('Cut latency *40%* overall')).toEqual([
+      { text: 'Cut latency ', emphasis: false },
+      { text: '40%', emphasis: true },
+      { text: ' overall', emphasis: false },
+    ])
+  })
+
+  it('handles multi-word emphasis and a string with no markers', () => {
+    expect(parseEmphasis('*shipped to 12 markets*')).toEqual([
+      { text: 'shipped to 12 markets', emphasis: true },
+    ])
+    expect(parseEmphasis('plain text')).toEqual([{ text: 'plain text', emphasis: false }])
   })
 })
 
@@ -222,6 +265,15 @@ describe('Projects', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Chaos-driven key generation for AES.')).toBeInTheDocument()
     expect(screen.getByText('C++')).toBeInTheDocument()
+  })
+
+  it('numbers each project with an oversized editorial index', () => {
+    render(<Projects items={projectFixture} />)
+    // Decorative, so it must not reach the accessibility tree as content.
+    const index = document.querySelector('[data-testid="project-index"]')
+    expect(index).not.toBeNull()
+    expect(index).toHaveTextContent('01')
+    expect(index).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('renders the cover image with its alt text', () => {
@@ -263,6 +315,109 @@ describe('Skills', () => {
   it('returns null for an empty array', () => {
     const { container } = render(<Skills groups={[]} />)
     expect(container).toBeEmptyDOMElement()
+  })
+})
+
+// ---------------------------------------------------------------- Metrics
+
+/**
+ * `Metrics` reads `prefers-reduced-motion` directly rather than through
+ * `motion/react`, so these tests stub `matchMedia` themselves. jsdom ships no
+ * implementation at all — the happy path needs the stub just as much as the
+ * reduced-motion path, or the component throws on an undefined `matchMedia`.
+ */
+function stubMatchMedia(reduced: boolean) {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn().mockImplementation((query: string) => ({
+      matches: reduced && query.includes('prefers-reduced-motion'),
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  )
+}
+
+const metricsFixture = [
+  { value: '800K+', label: 'monthly events processed' },
+  { value: '99.9%', label: 'billing pipeline uptime' },
+  { value: '<2s', label: 'p95 settlement latency' },
+]
+
+describe('Metrics', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('renders the final value and its label under reduced motion', () => {
+    stubMatchMedia(true)
+    render(<Metrics items={metricsFixture} />)
+    expect(screen.getByRole('heading', { level: 2, name: /impact/i })).toBeInTheDocument()
+    expect(screen.getByText('800K+')).toBeInTheDocument()
+    expect(screen.getByText('monthly events processed')).toBeInTheDocument()
+  })
+
+  it('preserves prefixes, suffixes and decimals in the final value', () => {
+    stubMatchMedia(true)
+    render(<Metrics items={metricsFixture} />)
+    expect(screen.getByText('99.9%')).toBeInTheDocument()
+    expect(screen.getByText('<2s')).toBeInTheDocument()
+  })
+
+  it('uses tabular figures so animated digits do not jitter', () => {
+    stubMatchMedia(true)
+    render(<Metrics items={metricsFixture} />)
+    expect(screen.getByText('800K+').className).toContain('tabular')
+  })
+
+  it('starts a count-up from zero when motion is allowed', () => {
+    stubMatchMedia(false)
+    render(<Metrics items={metricsFixture} />)
+    // The full string is still present for a11y and crawlers, whatever the
+    // animated figure currently reads.
+    expect(screen.getByText('monthly events processed')).toBeInTheDocument()
+    expect(document.querySelectorAll('[data-testid="metric-value"]').length).toBe(3)
+  })
+
+  it('returns null for an empty array', () => {
+    stubMatchMedia(true)
+    const { container } = render(<Metrics items={[]} />)
+    expect(container).toBeEmptyDOMElement()
+  })
+})
+
+describe('parseMetric', () => {
+  it('splits prefix, digits and suffix and keeps the decimal precision', () => {
+    expect(parseMetric('800K+')).toEqual({
+      prefix: '',
+      target: 800,
+      suffix: 'K+',
+      decimals: 0,
+    })
+    expect(parseMetric('99.9%')).toEqual({
+      prefix: '',
+      target: 99.9,
+      suffix: '%',
+      decimals: 1,
+    })
+    expect(parseMetric('<2s')).toEqual({ prefix: '<', target: 2, suffix: 's', decimals: 0 })
+  })
+
+  it('reads through digit grouping', () => {
+    expect(parseMetric('1,200')).toEqual({
+      prefix: '',
+      target: 1200,
+      suffix: '',
+      decimals: 0,
+    })
+  })
+
+  it('returns null when there is nothing to count', () => {
+    expect(parseMetric('N/A')).toBeNull()
   })
 })
 

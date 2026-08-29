@@ -45,7 +45,8 @@
   --color-surface-strong: var(--surface-strong);
   --color-accent-soft: var(--accent-soft);
 
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
   --font-mono: var(--font-geist-mono);
 
   --shadow-glass: 0 1px 0 0 color-mix(in oklab, var(--foreground) 8%, transparent) inset,
@@ -70,28 +71,61 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-body::before {
-  content: "";
+/*
+ * Film grain. A fixed noise layer at very low opacity stops large flat dark
+ * areas from banding on cheap panels and is most of why the design reads as
+ * "cinematic" rather than "a dark website". `contain: strict` keeps it from
+ * participating in layout or paint invalidation as the page scrolls.
+ */
+.grain-overlay {
   position: fixed;
   inset: 0;
-  z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(
-      60rem 40rem at 15% -10%,
-      color-mix(in oklab, var(--accent) 22%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      45rem 35rem at 95% 0%,
-      color-mix(in oklab, var(--accent) 12%, transparent),
-      transparent 65%
-    ),
-    radial-gradient(
-      50rem 50rem at 50% 120%,
-      color-mix(in oklab, var(--accent) 10%, transparent),
-      transparent 70%
-    );
+  z-index: 60;
+  opacity: 0.045;
+  contain: strict;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/*
+ * Outlined italic serif. Used for the quieter half of a heading pair, so the
+ * line reads as two voices rather than one long shout. `-webkit-text-stroke`
+ * has no standard equivalent with this support profile; the fallback where it
+ * is unsupported is simply solid text, which is still legible.
+ */
+.ghost {
+  font-family: var(--font-playfair), "Playfair Display", ui-serif, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: transparent;
+  -webkit-text-stroke: 1.4px color-mix(in oklab, var(--foreground) 48%, transparent);
+  letter-spacing: -0.01em;
+}
+
+.ghost-accent {
+  font-family: var(--font-playfair), "Playfair Display", ui-serif, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: transparent;
+  -webkit-text-stroke: 1.2px var(--accent);
+  letter-spacing: -0.01em;
+}
+
+/* Masks the hard bottom edge of the viewport so sections drift out of frame. */
+.bottom-blur {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 130px;
+  pointer-events: none;
+  z-index: 40;
+  background: linear-gradient(to top, var(--background), transparent);
+}
+
+/* Tabular figures keep animated metric counters from jittering as digits change. */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Selection and focus pick up the accent so the theme reads as intentional. */

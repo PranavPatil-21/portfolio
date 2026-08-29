@@ -7,10 +7,14 @@ import {
   getResponsibilities,
   getNativeArticles,
   getCustomSections,
+  getMetrics,
   getLayout,
 } from '@/content'
 import { fetchMediumArticles } from '@/lib/medium'
 import Nav from '@/components/Nav'
+import SmoothScroll from '@/components/SmoothScroll'
+import Cursor from '@/components/Cursor'
+import Grain from '@/components/Grain'
 import Footer from '@/components/Footer'
 import SectionRenderer from '@/components/SectionRenderer'
 
@@ -43,6 +47,16 @@ export default async function Home() {
 
   return (
     <>
+      {/*
+        Chrome that wraps the whole page. Each of these renders nothing at all
+        when the environment says it should not run — reduced motion for the
+        smooth scroll and the cursor, coarse pointers for the cursor — so none
+        of them needs a second guard here.
+      */}
+      <SmoothScroll />
+      <Cursor />
+      <Grain />
+
       <Nav layout={layout} settings={settings} customTitles={customTitles} />
       <main id="main" className="flex-1">
         <SectionRenderer
@@ -55,10 +69,14 @@ export default async function Home() {
             education: getEducation(),
             responsibilities: getResponsibilities(),
             articles,
+            metrics: getMetrics(),
             customSections,
           }}
         />
       </main>
+      {/* Masks the hard bottom edge of the viewport so sections drift out of frame. */}
+      <div className="bottom-blur" aria-hidden="true" />
+
       <Footer settings={settings} />
     </>
   )

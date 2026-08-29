@@ -8,7 +8,7 @@ current: false
 order: 2
 tech: [Java, Spring Boot, REST APIs, MySQL]
 bullets:
-  - Contributed to distributed backend services for credit card, installment, and SME lending platforms using Spring Boot and REST APIs, supporting thousands of active customer accounts.
-  - Built a Spring Boot-based deduplication API with unit-tested validation integrated into underwriting pipelines, leveraging hashing and database constraints to reduce latency by 50%.
-  - Implemented bank-initiated and customer-initiated credit limit increase flows with audit logging and approval workflows, improving operational turnaround time by 30%.
+  - "Halved underwriting validation latency (*50%*) by building a deduplication API on hashing and database constraints, integrated into the underwriting pipelines with unit-tested validation."
+  - "Cut operational turnaround on credit limit increases by *30%* by implementing both bank-initiated and customer-initiated flows with audit logging and approval workflows."
+  - "Contributed to the distributed backend services behind credit card, installment and SME lending for thousands of active customer accounts, in Spring Boot and REST APIs."
 ---

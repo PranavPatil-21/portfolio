@@ -5,13 +5,13 @@ location: Gurugram, India
 start: 2024-09
 current: true
 order: 1
-tech: [Java, Spring Boot, Kafka, FastAPI, LangGraph, PostgreSQL, Redis, Azure]
+tech: [Java, Spring Boot, Kafka, FastAPI, LangGraph, LiteLLM, Claude, MCP, A2A, PostgreSQL, Redis, Azure]
 bullets:
-  - Architecting and building WioGenie, a multi-agent AI system from scratch using FastAPI, LangGraph, LiteLLM, Claude, MCP, and A2A for production incident investigation through citation-backed reasoning across code, logs, Jira, and RCA documents; approved by engineering leadership for adoption.
-  - Owned Spring Boot-based lending microservices powering multiple loan products, designing core loan lifecycle orchestration, service integrations, and scalable REST APIs across Retail and SME portfolios.
-  - Architected a Kafka-based lending billing engine with partition-aware processing, idempotent workflows, and automated reconciliation, achieving 99% financial accuracy across 100K+ monthly statements.
-  - Built an asynchronous lending notification system using Kafka message queues with idempotent consumers processing 800K+ monthly events and improving on-time repayments by 40% with <1% delivery failures.
-  - Delivered FD-backed SME lending journeys by designing secured credit workflows, eligibility computation, approval pipelines, and risk validations, increasing SME customer conversion and retention by 42%.
-  - Optimized high-throughput credit card dashboard APIs via query tuning, indexing, and caching, supporting high-concurrency requests, reducing p95 latency from 3s to 1s, improving throughput by 50% under peak load.
-  - Implemented an event-driven leverage eligibility pipeline for margin trading, processing salary uploads and file events to maintain consistent blob-based records.
+  - "Built WioGenie, a multi-agent AI system that investigates production incidents by reasoning across code, logs, Jira and RCA documents — the archaeology an engineer would otherwise do by hand across four sources. Every answer is *citation-backed*, because an investigator that is confidently wrong is worse than none; architected from scratch on FastAPI, LangGraph, LiteLLM, Claude, MCP and A2A, and *approved by engineering leadership* for adoption."
+  - "Took monthly statement accuracy to *99%* across *100K+* statements by architecting the lending billing engine around partition-aware processing, idempotent workflows and automated reconciliation — removing a recurring source of customer billing disputes."
+  - "Lifted on-time repayments by *40%* by making reminders arrive reliably: an asynchronous Kafka notification system with idempotent consumers handling *800K+* monthly events at under 1% delivery failure."
+  - "Grew SME conversion and retention by *42%* with FD-backed lending journeys — designing the secured-credit workflow, eligibility computation, approval pipeline and risk validations."
+  - "Cut credit card dashboard p95 latency from *3s to 1s* and lifted throughput *50%* under peak load, through query tuning, indexing and caching."
+  - "Owned the Spring Boot lending microservices behind multiple Retail and SME loan products — the loan lifecycle orchestration, service integrations and REST APIs every product journey depends on."
+  - "Kept margin-trading leverage eligibility consistent by building an event-driven pipeline over salary uploads and file events, maintaining continuously reconciled blob-based records."
 ---

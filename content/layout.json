@@ -1,12 +1,40 @@
 {
   "sections": [
-    { "sectionId": "hero", "visible": true },
-    { "sectionId": "experience", "visible": true },
-    { "sectionId": "projects", "visible": true },
-    { "sectionId": "skills", "visible": true },
-    { "sectionId": "articles", "visible": true },
-    { "sectionId": "education", "visible": true },
-    { "sectionId": "responsibilities", "visible": true },
-    { "sectionId": "contact", "visible": true }
+    {
+      "sectionId": "hero",
+      "visible": true
+    },
+    {
+      "sectionId": "metrics",
+      "visible": true
+    },
+    {
+      "sectionId": "experience",
+      "visible": true
+    },
+    {
+      "sectionId": "projects",
+      "visible": true
+    },
+    {
+      "sectionId": "skills",
+      "visible": true
+    },
+    {
+      "sectionId": "articles",
+      "visible": true
+    },
+    {
+      "sectionId": "education",
+      "visible": true
+    },
+    {
+      "sectionId": "responsibilities",
+      "visible": true
+    },
+    {
+      "sectionId": "contact",
+      "visible": true
+    }
   ]
 }

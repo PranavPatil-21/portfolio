@@ -8,6 +8,7 @@ import type {
   Responsibility,
   CustomSection as CustomSectionType,
   LayoutEntry,
+  Metric,
 } from '@/content'
 
 import Hero from '@/components/sections/Hero'
@@ -19,6 +20,7 @@ import Responsibilities from '@/components/sections/Responsibilities'
 import Contact from '@/components/sections/Contact'
 import Articles from '@/components/sections/Articles'
 import CustomSection from '@/components/sections/CustomSection'
+import Metrics from '@/components/sections/Metrics'
 
 export type SiteContent = {
   settings: Settings
@@ -28,6 +30,7 @@ export type SiteContent = {
   education: EducationType[]
   responsibilities: Responsibility[]
   articles: Article[]
+  metrics: Metric[]
   customSections: CustomSectionType[]
 }
 
@@ -74,6 +77,8 @@ function renderSection(
   switch (id) {
     case 'hero':
       return <Hero settings={c.settings} />
+    case 'metrics':
+      return <Metrics items={c.metrics} />
     case 'experience':
       return <Experience items={c.experience} />
     case 'projects':

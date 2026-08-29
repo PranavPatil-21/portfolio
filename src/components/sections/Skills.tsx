@@ -1,39 +1,55 @@
 import { SectionShell } from '@/components/ui/SectionShell'
-import { Card } from '@/components/ui/Card'
-import { Tag } from '@/components/ui/Tag'
 import { Reveal } from '@/components/ui/Reveal'
 import type { SkillGroup } from '@/content/schemas'
 
 /**
- * Skills as labelled tag clusters — one card per group, so the grouping is
- * visible structure rather than a wall of undifferentiated pills. Groups with
- * no items are skipped individually; an empty group list omits the section.
+ * Skills as quiet typographic clusters.
+ *
+ * Deliberately the least decorated section on the page. For a product role the
+ * stack is *supporting evidence*, not the argument — Metrics and Experience
+ * make the case, and this exists so a reader who wants to check the substrate
+ * can, without it competing for attention. Hence no cards, no pills, no accent
+ * fills: a hairline, a mono label, and a comma-free run of items.
+ *
+ * Groups with no items are skipped individually; an empty group list omits the
+ * whole section.
  */
 export function Skills({ groups }: { groups: SkillGroup[] }) {
   if (groups.length === 0) return null
 
   return (
-    <SectionShell id="skills" title="Skills" subtitle="The tools I reach for.">
-      <div className="grid gap-6 sm:grid-cols-2">
+    <SectionShell
+      id="skills"
+      eyebrow="Technical"
+      title="Skills"
+      index="04 / SKILLS"
+      subtitle="The substrate under the work above."
+    >
+      <ul className="grid gap-px border-y border-[var(--hairline)] bg-[var(--hairline)] sm:grid-cols-2">
         {groups.map((group, i) => (
-          <Reveal key={group.label} delay={i * 0.06} className="h-full">
-            <Card className="h-full">
-              <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-[color:var(--accent-readable)]">
-                {group.label}
-              </h3>
-              {group.items.length > 0 ? (
-                <ul className="mt-4 flex flex-wrap gap-2">
-                  {group.items.map((item) => (
-                    <li key={item}>
-                      <Tag>{item}</Tag>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </Card>
-          </Reveal>
+          <li key={group.label} className="bg-[var(--background)]">
+            <Reveal delay={i * 0.05} className="h-full">
+              <div className="flex h-full flex-col gap-4 px-1 py-8 sm:px-6">
+                <h3 className="font-mono text-[10px] tracking-[0.35em] text-[var(--foreground)]/55 uppercase">
+                    {group.label}
+                </h3>
+                {group.items.length > 0 ? (
+                  <ul className="flex flex-wrap gap-x-5 gap-y-2">
+                      {group.items.map((item) => (
+                        <li
+                          key={item}
+                          className="text-sm text-[var(--foreground)]/55 transition-colors duration-300 hover:text-[var(--foreground)] motion-reduce:transition-none"
+                        >
+                          {item}
+                        </li>
+                      ))}
+                  </ul>
+                ) : null}
+              </div>
+            </Reveal>
+          </li>
         ))}
-      </div>
+      </ul>
     </SectionShell>
   )
 }

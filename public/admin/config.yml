@@ -22,6 +22,40 @@ public_folder: /uploads
 
 collections:
   # ---------------------------------------------------------------------------
+  # Impact figures — content/metrics.json
+  # ---------------------------------------------------------------------------
+  - name: metrics
+    label: Impact Figures
+    label_singular: Impact Figures
+    description: >-
+      The big numbers shown near the top of the page. Keep them to the few that
+      genuinely make your case — a long list reads as filler.
+    files:
+      - name: metrics
+        label: Impact Figures
+        file: content/metrics.json
+        fields:
+          - name: items
+            label: Figures
+            widget: list
+            required: false
+            label_singular: Figure
+            hint: Drag to reorder. Leave empty to hide the section entirely.
+            fields:
+              - name: value
+                label: Figure
+                widget: string
+                required: true
+                hint: >-
+                  Write it exactly as it should read, e.g. 800K+, 99%, <1% or
+                  3s -> 1s. The digits animate; anything around them is kept.
+              - name: label
+                label: What it measures
+                widget: string
+                required: true
+                hint: A short phrase, e.g. "monthly events processed".
+
+  # ---------------------------------------------------------------------------
   # Site settings — content/settings.json
   # ---------------------------------------------------------------------------
   - name: settings

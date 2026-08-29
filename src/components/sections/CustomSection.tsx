@@ -27,6 +27,10 @@ const LAYOUTS: Record<string, ComponentType<CustomLayoutProps>> = {
  * The `layout` value is schema-constrained, but published content can drift ahead
  * of a deploy (an editor picks a layout a newer schema added). An unrecognised
  * value degrades to `cards` rather than crashing the page.
+ *
+ * The four layouts stay visually distinct on purpose — the owner picks between
+ * them from the CMS, so collapsing two into the same shape would quietly remove
+ * a choice they rely on. `custom.test.tsx` pins that distinction structurally.
  */
 export function CustomSection({ section }: { section: CustomSectionData }) {
   if (section.items.length === 0) return null
@@ -36,6 +40,7 @@ export function CustomSection({ section }: { section: CustomSectionData }) {
   return (
     <SectionShell
       id={`custom:${section.slug}`}
+      eyebrow="Also"
       title={section.title}
       subtitle={section.body || undefined}
     >

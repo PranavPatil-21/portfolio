@@ -9,6 +9,7 @@ import {
   responsibilitySchema,
   customSectionSchema,
   layoutSchema,
+  metricsSchema,
 } from './schemas'
 import type {
   Settings,
@@ -20,6 +21,7 @@ import type {
   Responsibility,
   CustomSection,
   LayoutEntry,
+  Metric,
 } from './schemas'
 
 export * from './schemas'
@@ -66,6 +68,15 @@ export function getResponsibilities(): Responsibility[] {
 
 export function getCustomSections(): CustomSection[] {
   return byOrder(readCollection('sections', customSectionSchema))
+}
+
+/** Headline impact figures. Absent file is valid — the section simply omits. */
+export function getMetrics(): Metric[] {
+  try {
+    return readJson('metrics.json', metricsSchema).items
+  } catch {
+    return []
+  }
 }
 
 export function getLayout(): LayoutEntry[] {

@@ -37,7 +37,7 @@ describe('real content validates', () => {
   })
 
   it('references only known section ids in layout', () => {
-    const known = new Set(['hero','experience','projects','skills','articles','education','responsibilities','contact'])
+    const known = new Set(['hero','metrics','experience','projects','skills','articles','education','responsibilities','contact'])
     const custom = new Set(getCustomSections().map((s) => `custom:${s.slug}`))
     for (const entry of getLayout()) {
       expect(known.has(entry.sectionId) || custom.has(entry.sectionId)).toBe(true)

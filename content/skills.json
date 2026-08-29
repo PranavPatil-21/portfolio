@@ -1,8 +1,56 @@
 {
   "groups": [
-    { "label": "Languages", "items": ["Java", "C/C++", "SQL"] },
-    { "label": "Frameworks & Tools", "items": ["Spring Boot", "FastAPI", "LangGraph", "Kafka", "Docker", "Kubernetes", "Redis", "Git", "Azure"] },
-    { "label": "Databases", "items": ["PostgreSQL", "MongoDB", "MySQL"] },
-    { "label": "Core Concepts", "items": ["Data Structures & Algorithms", "OOP", "Operating Systems", "DBMS", "Computer Networks", "System Design", "LLMs", "RAG"] }
+    {
+      "label": "AI & LLM Systems",
+      "items": [
+        "Multi-Agent Orchestration",
+        "LangGraph",
+        "MCP",
+        "A2A",
+        "LiteLLM",
+        "Claude",
+        "RAG",
+        "LLMs",
+        "Citation-Backed Reasoning"
+      ]
+    },
+    {
+      "label": "Backend & Distributed Systems",
+      "items": [
+        "Java",
+        "Spring Boot",
+        "FastAPI",
+        "Kafka",
+        "REST APIs",
+        "Event-Driven Architecture",
+        "System Design",
+        "Idempotent Processing"
+      ]
+    },
+    {
+      "label": "Platform & Data",
+      "items": [
+        "PostgreSQL",
+        "MongoDB",
+        "MySQL",
+        "Redis",
+        "Docker",
+        "Kubernetes",
+        "Azure",
+        "Git",
+        "SQL"
+      ]
+    },
+    {
+      "label": "Foundations",
+      "items": [
+        "Data Structures & Algorithms",
+        "OOP",
+        "Operating Systems",
+        "DBMS",
+        "Computer Networks",
+        "C/C++"
+      ]
+    }
   ]
 }

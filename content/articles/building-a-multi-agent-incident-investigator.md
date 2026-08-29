@@ -1,19 +1,17 @@
 ---
-title: Building a Multi-Agent Incident Investigator
-excerpt: Notes on designing an AI system that investigates production incidents by reasoning across code, logs, tickets and RCA documents — with citations.
+title: Why Citations, Not Answers, Decide Whether an AI Agent Gets Adopted
+excerpt: Building a multi-agent incident investigator taught me that verifiability — not fluency — is the adoption gate for AI products aimed at sceptical technical users.
 date: 2026-08-29
 draft: true
-tags: [AI, Agents, LangGraph, Distributed Systems]
+tags: [AI Products, Agents, LangGraph, Trust & Verifiability]
 ---
 
 ## Why citations matter more than answers
 
 An incident investigator that is confidently wrong is worse than no
-investigator at all. The design constraint that shaped everything else was
-that every claim the system makes must point back at the artifact it came
-from — a line of code, a log entry, a Jira comment.
+investigator at all — it spends the responder's attention instead of saving it.
+The design constraint that shaped everything else was that every claim the
+system makes must point back at the artifact it came from: a line of code, a
+log entry, a Jira comment.
 
-## Replace this
-
-This is a placeholder article so the articles section has something to render.
-Edit or delete it from the admin panel at `/admin`.
+*Draft — notes in progress. Edit or delete from `/admin`.*

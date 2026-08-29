@@ -1,0 +1,9 @@
+{
+  "items": [
+    { "value": "800K+", "label": "monthly events processed across lending pipelines" },
+    { "value": "99%", "label": "financial accuracy across 100K+ monthly statements" },
+    { "value": "40%", "label": "improvement in on-time loan repayments" },
+    { "value": "42%", "label": "lift in SME conversion and retention" },
+    { "value": "3s → 1s", "label": "p95 latency on high-concurrency dashboard APIs" }
+  ]
+}

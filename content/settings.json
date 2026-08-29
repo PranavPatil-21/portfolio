@@ -1,11 +1,11 @@
 {
   "name": "Pranav Patil",
   "roles": [
-    "Software Engineer",
-    "Backend & Distributed Systems",
-    "AI Systems"
+    "Software Engineer, moving toward Product",
+    "AI & Multi-Agent Systems",
+    "Fintech: Lending & Payments"
   ],
-  "bio": "Software engineer building backend systems for lending and payments at Wio Bank — Spring Boot microservices, Kafka-driven pipelines, and multi-agent AI systems. I like problems where correctness and throughput both matter.",
+  "bio": "I'm a software engineer at Wio Bank, where I build the lending and payments systems behind Retail and SME credit products — and where I architected WioGenie, a multi-agent AI system that investigates production incidents with citation-backed reasoning. I care most about the decision behind a system: who it's for, what breaks without it, and which constraint you refuse to trade away. I'm moving toward product roles where AI is the product, not the garnish.",
   "location": "Gurugram, India",
   "email": "pranavnarendrapatil.2104@gmail.com",
   "phone": "+91 7623955135",
@@ -28,14 +28,14 @@
     }
   ],
   "theme": {
-    "accent": "#6d4aff",
-    "background": "#08080c",
-    "foreground": "#f4f4f7",
+    "accent": "#ff6b1a",
+    "background": "#080808",
+    "foreground": "#ffffff",
     "defaultMode": "dark"
   },
   "seo": {
-    "title": "Pranav Patil — Software Engineer",
-    "description": "Software engineer building backend systems for lending and payments: Spring Boot, Kafka, distributed systems and multi-agent AI."
+    "title": "Pranav Patil — Engineer building AI and fintech products",
+    "description": "Software engineer at Wio Bank building lending and payments systems and multi-agent AI. Billing accuracy at 99% across 100K+ statements, 800K+ monthly events, and WioGenie — a citation-backed incident investigator."
   },
   "features": {
     "hero3d": true,
