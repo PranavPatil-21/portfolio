@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import TopBar from '@/components/TopBar'
 import Link from 'next/link'
 import { getProjects, getSettings } from '@/content'
 import type { Project } from '@/content'
@@ -81,7 +82,9 @@ export default function WorkPage() {
   })).filter((group) => group.items.length > 0)
 
   return (
-    <main id="main" className="mx-auto w-full max-w-3xl px-6 py-20 sm:py-28">
+    <>
+      <TopBar settings={getSettings()} variant="sub" />
+      <main id="main" className="mx-auto w-full max-w-3xl px-6 py-20 sm:py-28">
       <header className="max-w-2xl">
         <p className="eyebrow">Case studies</p>
         <h1 className="display mt-4 text-balance text-[var(--foreground)]">Work</h1>
@@ -125,5 +128,6 @@ export default function WorkPage() {
         </Link>
       </p>
     </main>
+    </>
   )
 }

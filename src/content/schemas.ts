@@ -261,6 +261,33 @@ export const customSectionSchema = z.object({
 })
 
 
+/**
+ * A scripted, interactive walkthrough of a system doing its job.
+ *
+ * The site's one "show, don't tell" moment: rather than describing the
+ * multi-agent investigator in a paragraph, the reader can run it. Content-driven
+ * rather than hardcoded so the owner can rewrite the story — or point it at
+ * different work entirely — from `/admin`.
+ */
+export const replayStepSchema = z.object({
+  actor: z.string().min(1),
+  action: z.string().min(1),
+  finding: optionalish(z.string()),
+  citation: optionalish(z.string()),
+  /** Milliseconds this step holds before the next begins during playback. */
+  hold: orderField,
+})
+
+export const replaySchema = z.object({
+  enabled: z.boolean().default(false),
+  title: z.string().default(''),
+  intro: z.string().default(''),
+  trigger: z.string().default(''),
+  incident: z.string().default(''),
+  steps: z.array(replayStepSchema).default([]),
+  conclusion: z.string().default(''),
+})
+
 export const layoutEntrySchema = z.object({
   sectionId: z.string().min(1),
   visible: z.boolean().default(true),
@@ -281,5 +308,7 @@ export type Responsibility = z.infer<typeof responsibilitySchema>
 export type CustomItem = z.infer<typeof customItemSchema>
 export type CustomSection = z.infer<typeof customSectionSchema>
 export type Metric = z.infer<typeof metricSchema>
+export type ReplayStep = z.infer<typeof replayStepSchema>
+export type Replay = z.infer<typeof replaySchema>
 export type LayoutEntry = z.infer<typeof layoutEntrySchema>
 export type Link = z.infer<typeof linkSchema>

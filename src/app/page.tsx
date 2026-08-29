@@ -8,6 +8,7 @@ import {
   getNativeArticles,
   getCustomSections,
   getMetrics,
+  getReplay,
   getLayout,
 } from '@/content'
 import { fetchMediumArticles } from '@/lib/medium'
@@ -16,6 +17,7 @@ import SideRail from '@/components/SideRail'
 import Spotlight from '@/components/Spotlight'
 import ScrollProgress from '@/components/ScrollProgress'
 import CommandPalette, { type CommandItem } from '@/components/CommandPalette'
+import TopBar from '@/components/TopBar'
 import SectionRenderer from '@/components/SectionRenderer'
 
 /**
@@ -51,6 +53,7 @@ export default async function Home() {
   const education = getEducation()
   const responsibilities = getResponsibilities()
   const metrics = getMetrics()
+  const replay = getReplay()
 
   /*
    * Sections listed in the layout that will render nothing, because their
@@ -67,6 +70,7 @@ export default async function Home() {
   if (!education.length) emptyIds.add('education')
   if (!responsibilities.length) emptyIds.add('responsibilities')
   if (!metrics.length) emptyIds.add('metrics')
+  if (!replay) emptyIds.add('replay')
   for (const section of customSections) {
     if (!section.items.length) emptyIds.add(`custom:${section.slug}`)
   }
@@ -80,6 +84,7 @@ export default async function Home() {
   const SECTION_LABELS: Record<string, string> = {
     current: 'Current role',
     metrics: 'Impact',
+    replay: 'See it run',
     experience: 'Experience',
     projects: 'Case studies',
     skills: 'Skills',
@@ -88,6 +93,13 @@ export default async function Home() {
     responsibilities: 'Leadership',
     contact: 'Contact',
   }
+
+  const navSections = layout
+    .filter((e) => e.visible && e.sectionId !== 'hero' && !emptyIds.has(e.sectionId))
+    .flatMap((e) => {
+      const label = SECTION_LABELS[e.sectionId] ?? customTitles.get(e.sectionId)
+      return label ? [{ id: e.sectionId, label }] : []
+    })
 
   const commandItems: CommandItem[] = [
     ...layout
@@ -133,6 +145,7 @@ export default async function Home() {
   return (
     <>
       <ScrollProgress />
+      <TopBar settings={settings} variant="home" sections={navSections} />
       <Spotlight />
       <CommandPalette items={commandItems} />
 
@@ -141,10 +154,19 @@ export default async function Home() {
         evidence scrolls on the right. On narrow screens the rail simply stacks
         above the content.
       */}
-      <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 px-6 py-16 sm:px-10 lg:flex-row lg:justify-between lg:gap-16 lg:py-0">
+      <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 px-6 py-16 sm:px-10 lg:grid lg:grid-cols-[minmax(0,43%)_minmax(0,57%)] lg:gap-0 lg:px-0 lg:py-0">
         <SideRail settings={settings} layout={layout} emptyIds={emptyIds} />
 
-        <main id="main" className="relative z-10 pt-6 lg:w-[54%] lg:py-24">
+        {/*
+          The content column is visually a separate surface from the rail: a
+          hairline divider, a slight tonal lift and its own padding. Without
+          that separation the two halves read as one undifferentiated page and
+          the sticky rail looks like content that failed to scroll.
+        */}
+        <main
+          id="main"
+          className="relative z-10 pt-6 lg:border-l lg:border-[var(--hairline)] lg:bg-[var(--surface)] lg:py-24 lg:pr-2 lg:pl-14"
+        >
           <SectionRenderer
             layout={layout}
             content={{
@@ -156,6 +178,7 @@ export default async function Home() {
               responsibilities,
               articles,
               metrics,
+              replay,
               customSections,
             }}
           />

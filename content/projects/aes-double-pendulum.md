@@ -1,25 +1,40 @@
 ---
+title: AES Cryptosystem Keyed by a Double Pendulum
 category: systems
-title: AES Cryptosystem via Double Pendulum
-summary: An AES encryption system whose key generation is driven by double-pendulum chaos — trading a conventional entropy source for one that is trivially reproducible from a seed and practically unpredictable without it.
-date: 2023-09
+featured: false
 order: 8
-featured: true
-tech: [C++, Cryptography, AES, Chaos Theory]
-repo: https://github.com/PranavPatil-21
+date: '2023-09'
+context: Personal project, built while at university
+summary: >-
+  An AES implementation whose key material comes from double-pendulum chaos —
+  an experiment in where entropy comes from, rather than in the cipher itself.
+problem: >-
+  AES is only as strong as the key material fed into it. The interesting question
+  is not the cipher but the source behind it: can one source be practically
+  unpredictable to an attacker and still exactly reproducible for whoever holds
+  the seed?
+approach: >-
+  Simulate a double pendulum, the textbook chaotic system, and sample its state
+  over time to generate the key material AES then encrypts with.
+decision: >-
+  Take unpredictability and reproducibility from the same mechanism instead of
+  two. A double pendulum diverges exponentially from arbitrarily close starting
+  conditions, so the exact seed regenerates the exact key while a near-miss
+  regenerates nothing useful — which is precisely the asymmetry key material
+  needs.
+outcome: >-
+  A working end-to-end implementation, and a clearer sense of how much of a
+  cryptosystem's strength sits outside the algorithm. An exercise, not a
+  production cryptosystem.
+tech:
+  - C++
+  - AES
+  - Cryptography
+  - Chaos Theory
+flow:
+  - Seed
+  - Double pendulum
+  - Sampled state
+  - AES key
+  - Ciphertext
 ---
-
-## The problem
-
-AES is only as strong as the key material fed into it. The interesting question
-is not the cipher but the source of entropy behind it, and whether that source
-can be both unpredictable to an attacker and reproducible to the holder of the
-seed.
-
-## The decision
-
-Use a double pendulum. It is the textbook chaotic system: arbitrarily small
-differences in initial conditions diverge exponentially. Sampling its state
-space gives key material that is deterministic to regenerate given the seed,
-yet practically unpredictable without it — raising entropy and resistance to
-key predictability without needing an external randomness source.

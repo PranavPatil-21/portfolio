@@ -1,0 +1,44 @@
+{
+  "enabled": true,
+  "title": "Watch it work",
+  "intro": "WioGenie is easier to understand by running it than by reading about it. This is an illustrative walkthrough of how it investigates a production incident — the sequence and the citation behaviour are real; the incident itself is a composite, not a customer one.",
+  "trigger": "Run the investigation",
+  "incident": "02:14 — repayment notification failures spike to 4% on the SME lending topic. On-call is paged.",
+  "steps": [
+    {
+      "actor": "Router",
+      "action": "Reads the alert and decides which sources are worth opening.",
+      "finding": "Consumer-side failure, not a delivery-provider outage. Fans out to code, logs and history.",
+      "hold": 1400
+    },
+    {
+      "actor": "Logs agent",
+      "action": "Scans the consumer group around the spike.",
+      "finding": "Rebalance storm — the group rebalanced 14 times in nine minutes. Failures cluster inside those windows.",
+      "citation": "kibana · lending-notification-consumer · 02:05–02:20",
+      "hold": 1800
+    },
+    {
+      "actor": "Code agent",
+      "action": "Opens the consumer and reads the commit history around it.",
+      "finding": "max.poll.interval.ms is unchanged, but a template lookup added last week made processing slower per message.",
+      "citation": "lending-notification-service · NotificationConsumer.java:88",
+      "hold": 1800
+    },
+    {
+      "actor": "History agent",
+      "action": "Searches Jira and past RCAs for the same signature.",
+      "finding": "Seen once before, eleven months ago, on a different service. Same cause: work per message outgrew the poll interval.",
+      "citation": "TES-19442 · RCA: consumer rebalance under slow handlers",
+      "hold": 1800
+    },
+    {
+      "actor": "Synthesis",
+      "action": "Assembles the answer and checks every claim carries a source.",
+      "finding": "Slower per-message work pushed processing past max.poll.interval.ms; the broker assumed the consumer was dead and rebalanced. Retries then landed mid-rebalance and failed.",
+      "citation": "3 sources cited · 0 uncited claims",
+      "hold": 2000
+    }
+  ],
+  "conclusion": "Root cause in under a minute, with every claim traceable to a log line, a file or a prior RCA. The citation trail is the product: it is what lets a responder disagree with the machine quickly, instead of trusting it slowly."
+}

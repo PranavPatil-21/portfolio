@@ -8,8 +8,8 @@ tags: [AI Products, Agents, LangGraph, Trust & Verifiability]
 
 ## Why citations matter more than answers
 
-An incident investigator that is confidently wrong is worse than no
-investigator at all — it spends the responder's attention instead of saving it.
+An incident investigator that cannot show its working spends the responder's
+attention instead of saving it.
 The design constraint that shaped everything else was that every claim the
 system makes must point back at the artifact it came from: a line of code, a
 log entry, a Jira comment.

@@ -10,6 +10,7 @@ import {
   customSectionSchema,
   layoutSchema,
   metricsSchema,
+  replaySchema,
 } from './schemas'
 import type {
   Settings,
@@ -22,6 +23,7 @@ import type {
   CustomSection,
   LayoutEntry,
   Metric,
+  Replay,
 } from './schemas'
 
 export * from './schemas'
@@ -76,6 +78,16 @@ export function getMetrics(): Metric[] {
     return readJson('metrics.json', metricsSchema).items
   } catch {
     return []
+  }
+}
+
+/** The interactive walkthrough. Absent file is valid — the section omits. */
+export function getReplay(): Replay | null {
+  try {
+    const replay = readJson('replay.json', replaySchema)
+    return replay.enabled && replay.steps.length > 0 ? replay : null
+  } catch {
+    return null
   }
 }
 

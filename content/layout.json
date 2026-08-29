@@ -13,6 +13,10 @@
       "visible": true
     },
     {
+      "sectionId": "replay",
+      "visible": true
+    },
+    {
       "sectionId": "experience",
       "visible": true
     },

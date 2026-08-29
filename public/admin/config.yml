@@ -22,6 +22,72 @@ public_folder: /uploads
 
 collections:
   # ---------------------------------------------------------------------------
+  # Interactive walkthrough — content/replay.json
+  # ---------------------------------------------------------------------------
+  - name: replay
+    label: Interactive Walkthrough
+    label_singular: Interactive Walkthrough
+    description: >-
+      The scripted "watch it work" demo. Readers press a button and the steps
+      reveal one at a time. Everything here is your words — rewrite it to tell a
+      different story, or untick Enabled to hide the section.
+    files:
+      - name: replay
+        label: Interactive Walkthrough
+        file: content/replay.json
+        fields:
+          - name: enabled
+            label: Enabled
+            widget: boolean
+            default: false
+            hint: Untick to hide the whole section.
+          - name: title
+            label: Section title
+            widget: string
+            required: false
+          - name: intro
+            label: Intro
+            widget: text
+            required: false
+            hint: One or two sentences setting up what the reader is about to watch.
+          - name: trigger
+            label: Button label
+            widget: string
+            required: false
+            hint: e.g. "Run the investigation".
+          - name: incident
+            label: The opening event
+            widget: text
+            required: false
+            hint: The alert or trigger that starts the story.
+          - name: steps
+            label: Steps
+            widget: list
+            required: false
+            label_singular: Step
+            summary: '{{fields.actor}} — {{fields.action}}'
+            fields:
+              - { name: actor, label: Who acts, widget: string, required: true }
+              - { name: action, label: What they do, widget: text, required: true }
+              - { name: finding, label: What they find, widget: text, required: false }
+              - name: citation
+                label: Source
+                widget: string
+                required: false
+                hint: The evidence behind the finding — a file, a log, a ticket.
+              - name: hold
+                label: Pause (milliseconds)
+                widget: number
+                value_type: int
+                default: 1600
+                required: false
+                hint: How long this step holds before the next one. 1500-2000 reads well.
+          - name: conclusion
+            label: Closing line
+            widget: text
+            required: false
+
+  # ---------------------------------------------------------------------------
   # Impact figures — content/metrics.json
   # ---------------------------------------------------------------------------
   - name: metrics

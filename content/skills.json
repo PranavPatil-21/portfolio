@@ -1,34 +1,45 @@
 {
   "groups": [
     {
-      "label": "AI & LLM Systems",
+      "label": "Lending & Credit Domain",
+      "items": [
+        "Retail & SME Lending",
+        "Secured / FD-Backed Credit",
+        "Loan Lifecycle Orchestration",
+        "Underwriting Validation",
+        "Credit Limit Workflows",
+        "Billing & Reconciliation",
+        "Repayments & Notifications"
+      ]
+    },
+    {
+      "label": "AI & Agent Systems",
       "items": [
         "Multi-Agent Orchestration",
+        "Citation-Backed Reasoning",
+        "RAG",
         "LangGraph",
         "MCP",
         "A2A",
         "LiteLLM",
-        "Claude",
-        "RAG",
-        "LLMs",
-        "Citation-Backed Reasoning"
+        "Claude"
       ]
     },
     {
-      "label": "Backend & Distributed Systems",
+      "label": "Event-Driven Backend Systems",
       "items": [
         "Java",
         "Spring Boot",
         "FastAPI",
         "Kafka",
-        "REST APIs",
         "Event-Driven Architecture",
-        "System Design",
-        "Idempotent Processing"
+        "Idempotent Processing",
+        "REST API Design",
+        "System Design"
       ]
     },
     {
-      "label": "Platform & Data",
+      "label": "Data & Infrastructure",
       "items": [
         "PostgreSQL",
         "MongoDB",
@@ -36,21 +47,7 @@
         "Redis",
         "Docker",
         "Kubernetes",
-        "Azure",
-        "Git",
-        "SQL"
-      ]
-    },
-    {
-      "label": "Lending & Fintech Domain",
-      "items": [
-        "Retail & SME Lending",
-        "Secured / FD-Backed Credit",
-        "Loan Lifecycle Orchestration",
-        "Billing & Reconciliation",
-        "Credit Limit Workflows",
-        "Underwriting Validation",
-        "Payments & Notifications"
+        "Azure"
       ]
     }
   ]

@@ -217,7 +217,12 @@ export function CommandPalette({ items }: { items: CommandItem[] }) {
 
   return (
     <>
-      {chip}
+      {/*
+        Anchored bottom-right rather than left in page flow. Rendered inline it
+        landed as a stray strip across the top of the document, above the
+        header, which read as a rendering fault rather than an affordance.
+      */}
+      <div className="pointer-events-auto fixed right-5 bottom-5 z-40 hidden sm:block">{chip}</div>
       {open && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[12vh]">
           <div

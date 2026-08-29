@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import TopBar from '@/components/TopBar'
 import Link from 'next/link'
 import { getNativeArticles, getSettings } from '@/content'
 import { ArticleCard } from '@/components/sections/Articles'
@@ -16,7 +17,9 @@ export default function ArticlesPage() {
   const articles = getNativeArticles()
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-6 py-20 sm:py-28">
+    <>
+      <TopBar settings={getSettings()} variant="sub" />
+      <main className="mx-auto w-full max-w-5xl px-6 py-20 sm:py-28">
       <header className="mb-12 max-w-2xl">
         <h1 className="text-4xl font-semibold tracking-tight text-[color:var(--foreground)] text-balance sm:text-5xl">
           Writing
@@ -50,5 +53,6 @@ export default function ArticlesPage() {
         </Link>
       </p>
     </main>
+    </>
   )
 }
