@@ -9,9 +9,11 @@
   <body>
     <!--
       Sveltia CMS is a single-page app served from a CDN — no build step and no
-      dependency in this repo. Do not add a stylesheet or type="module": all
+      dependency in this repo. The version is pinned to a minor range: an
+      unpinned URL would silently break this admin on an upstream release, on a
+      site nobody is watching. Do not add a stylesheet or type="module": all
       styling is bundled inside the script, and the module attribute breaks it.
     -->
-    <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+    <script src="https://unpkg.com/@sveltia/cms@^0.201.2/dist/sveltia-cms.js"></script>
   </body>
 </html>
