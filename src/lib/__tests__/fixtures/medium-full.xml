@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<channel>
+<title><![CDATA[Stories by Pranav Patil on Medium]]></title>
+<description><![CDATA[Stories by Pranav Patil on Medium]]></description>
+<link>https://medium.com/@pranav</link>
+<lastBuildDate>Sat, 29 Aug 2026 09:00:00 GMT</lastBuildDate>
+<item>
+<title><![CDATA[Designing Idempotent Payment APIs]]></title>
+<link>https://medium.com/@pranav/designing-idempotent-payment-apis-9f1c2d3e4b5a?source=rss-abc123------2</link>
+<guid isPermaLink="false">9f1c2d3e4b5a</guid>
+<category><![CDATA[payments]]></category>
+<category><![CDATA[api-design]]></category>
+<dc:creator><![CDATA[Pranav Patil]]></dc:creator>
+<pubDate>Fri, 15 Aug 2026 10:30:00 GMT</pubDate>
+<atom:updated>2026-08-15T10:30:00.000Z</atom:updated>
+<description><![CDATA[<p>Why <em>every</em> money-moving POST needs a key.</p>]]></description>
+<content:encoded><![CDATA[<h2>The problem</h2>
+<p>Retries are <strong>inevitable</strong>.</p>
+<p>See <a href="https://example.com/spec">the spec</a>.</p>]]></content:encoded>
+</item>
+<item>
+<title><![CDATA[A Short Note on Kafka Retries]]></title>
+<link>https://medium.com/@pranav/a-short-note-on-kafka-retries-1a2b3c4d5e6f</link>
+<guid isPermaLink="false">1a2b3c4d5e6f</guid>
+<category><![CDATA[kafka]]></category>
+<dc:creator><![CDATA[Pranav Patil]]></dc:creator>
+<pubDate>Tue, 01 Jul 2026 06:00:00 GMT</pubDate>
+<description><![CDATA[<p>Backoff, jitter, and the dead letter topic.</p>]]></description>
+<content:encoded><![CDATA[<p>Exponential backoff with jitter beats a fixed delay.</p>]]></content:encoded>
+</item>
+</channel>
+</rss>

@@ -1,26 +1,125 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens.
+ *
+ * `--accent`, `--background` and `--foreground` are the three values the owner
+ * edits in `/admin`; `themeToCssVars()` injects them as inline styles on
+ * `<html>`, which overrides the defaults below. Everything else is *derived*
+ * from those three with `color-mix`, so a palette change in the CMS moves the
+ * whole surface treatment with it and never leaves a hardcoded grey behind.
+ *
+ * The defaults are the dark palette: the site is dark-first, and these are what
+ * renders in the brief moment before (or if ever without) CMS values.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --accent: #6c5ce7;
+  --background: #0b0b12;
+  --foreground: #f5f5f7;
+
+  /* Derived — do not set these from the CMS. */
+  --muted: color-mix(in oklab, var(--foreground) 62%, var(--background));
+  --hairline: color-mix(in oklab, var(--foreground) 14%, transparent);
+  --surface: color-mix(in oklab, var(--foreground) 4%, transparent);
+  --surface-strong: color-mix(in oklab, var(--foreground) 8%, transparent);
+  --accent-soft: color-mix(in oklab, var(--accent) 18%, transparent);
 }
 
 @theme inline {
+  /* CMS-driven — these are the reason the whole file exists. */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+
+  /* Derived surface scale. */
+  --color-muted: var(--muted);
+  --color-hairline: var(--hairline);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-accent-soft: var(--accent-soft);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --shadow-glass: 0 1px 0 0 color-mix(in oklab, var(--foreground) 8%, transparent) inset,
+    0 18px 40px -24px rgb(0 0 0 / 0.55);
+  --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--accent) 28%, transparent),
+    0 24px 60px -28px color-mix(in oklab, var(--accent) 55%, transparent);
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/*
+ * Ambient gradient wash. Two soft accent pools plus a fine grid, fixed to the
+ * viewport so content scrolls over a stable field rather than dragging the
+ * gradient with it. Purely decorative — `body::before` keeps it out of the
+ * accessibility tree entirely.
+ */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      60rem 40rem at 15% -10%,
+      color-mix(in oklab, var(--accent) 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      45rem 35rem at 95% 0%,
+      color-mix(in oklab, var(--accent) 12%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      50rem 50rem at 50% 120%,
+      color-mix(in oklab, var(--accent) 10%, transparent),
+      transparent 70%
+    );
+}
+
+/* Selection and focus pick up the accent so the theme reads as intentional. */
+::selection {
+  background: color-mix(in oklab, var(--accent) 35%, transparent);
+  color: var(--foreground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Anchor navigation lands below the sticky nav rather than under it. */
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+ * `prefers-reduced-motion` is honoured everywhere, without exception. Motion
+ * components opt out in JS via `useReducedMotion()`; this covers CSS
+ * transitions, the smooth scroll, and anything a future component adds.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

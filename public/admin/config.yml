@@ -1,0 +1,811 @@
+# Sveltia CMS schema for the portfolio.
+#
+# This file MUST mirror `src/content/schemas.ts` field-for-field. Every value
+# saved here is committed to the repo and then validated by Zod at build time:
+# a field this file allows but the schema rejects fails the Vercel build, and
+# the previous deploy stays live until it is fixed.
+#
+# Rules of thumb when editing:
+#   • Stricter here than in Zod is always safe. Looser is never safe.
+#   • Optional fields must have NO `default:` — Zod's `.optional()` accepts an
+#     absent field, not an empty string.
+#   • Every image field has a sibling alt-text field wherever the schema
+#     defines one. Fill it in whenever you upload an image.
+
+backend:
+  name: github
+  repo: PranavPatil-21/portfolio
+  branch: main
+
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  # ---------------------------------------------------------------------------
+  # Site settings — content/settings.json
+  # ---------------------------------------------------------------------------
+  - name: settings
+    label: Site Settings
+    label_singular: Site Settings
+    description: >-
+      Your name, contact details, theme colours, search-engine text and feature
+      toggles. Everything here appears on every page.
+    files:
+      - name: settings
+        label: Site Settings
+        file: content/settings.json
+        fields:
+          - name: name
+            label: Full name
+            widget: string
+            required: true
+            hint: Shown in the hero, the browser tab and your structured data.
+
+          - name: roles
+            label: Roles
+            widget: list
+            field: { name: role, label: Role, widget: string, required: true }
+            required: true
+            hint: >-
+              At least one is required. The first one is used as your job title
+              in search results and on the social sharing image.
+
+          - name: bio
+            label: Bio
+            widget: text
+            required: true
+            hint: Two or three sentences. Appears in the hero and in search results.
+
+          - name: location
+            label: Location
+            widget: string
+            required: false
+            default: ''
+            hint: 'For example: Gurugram, India. Leave blank to hide it.'
+
+          - name: email
+            label: Email address
+            widget: string
+            required: true
+            pattern:
+              - '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+              - Enter a valid email address
+            hint: Used for the contact link and your structured data.
+
+          - name: phone
+            label: Phone number
+            widget: string
+            required: false
+            hint: Optional. Leave blank to hide it.
+
+          - name: avatar
+            label: Profile photo
+            widget: image
+            required: false
+            hint: Optional. A square image works best.
+
+          - name: avatarAlt
+            label: Profile photo — alt text
+            widget: string
+            required: false
+            hint: >-
+              REQUIRED whenever you upload a profile photo. Describe the image
+              for people using a screen reader, e.g. "Pranav Patil, smiling".
+
+          - name: resumePdf
+            label: Resume (PDF)
+            widget: file
+            required: false
+            hint: Optional. Upload a PDF; the download button appears automatically.
+
+          - name: socials
+            label: Social links
+            widget: list
+            required: false
+            label_singular: Social link
+            summary: '{{fields.label}}'
+            hint: Shown in the header and footer. Drag to reorder.
+            fields:
+              - name: label
+                label: Label
+                widget: string
+                required: true
+                hint: 'The visible name, e.g. GitHub.'
+              - name: url
+                label: URL
+                widget: string
+                required: true
+                pattern:
+                  - '^(https?://|mailto:|tel:).+'
+                  - 'Must start with https://, mailto: or tel:'
+                hint: 'Full URL, e.g. https://github.com/PranavPatil-21'
+              - name: icon
+                label: Icon
+                widget: string
+                required: true
+                hint: >-
+                  Icon key. Known values are github, linkedin, mail, twitter,
+                  globe. An unknown key falls back to a generic link icon.
+
+          - name: theme
+            label: Theme
+            widget: object
+            required: true
+            hint: Colours must be 6-digit hex (no transparency).
+            fields:
+              - name: accent
+                label: Accent colour
+                widget: color
+                required: true
+                enableAlpha: false
+                allowInput: true
+                default: '#7c5cff'
+                hint: Links, highlights and the 3D hero glow.
+              - name: background
+                label: Background colour
+                widget: color
+                required: true
+                enableAlpha: false
+                allowInput: true
+                default: '#08080c'
+                hint: The page background in the default mode.
+              - name: foreground
+                label: Text colour
+                widget: color
+                required: true
+                enableAlpha: false
+                allowInput: true
+                default: '#f4f4f7'
+                hint: >-
+                  Body text. Keep strong contrast against the background —
+                  low contrast fails the accessibility budget.
+              - name: defaultMode
+                label: Default colour mode
+                widget: select
+                required: true
+                default: dark
+                options: ['light', 'dark', 'system']
+                hint: >-
+                  Which mode a first-time visitor sees. "system" follows their
+                  operating system setting.
+
+          - name: seo
+            label: Search & sharing
+            widget: object
+            required: true
+            fields:
+              - name: title
+                label: Page title
+                widget: string
+                required: true
+                hint: 'Shown in the browser tab and in Google results, e.g. "Pranav Patil — Software Engineer".'
+              - name: description
+                label: Meta description
+                widget: text
+                required: true
+                hint: One or two sentences shown under the title in search results. Aim for 150–160 characters.
+              - name: ogImage
+                label: Social sharing image
+                widget: image
+                required: false
+                hint: >-
+                  Optional override for the automatically generated sharing
+                  card. 1200×630 pixels. Leave blank to use the generated one.
+
+          - name: features
+            label: Features
+            widget: object
+            required: true
+            fields:
+              - name: hero3d
+                label: 3D hero animation
+                widget: boolean
+                required: false
+                default: true
+                hint: >-
+                  Turn off to replace the animated hero with a static image.
+                  It is already disabled automatically on low-power devices and
+                  for visitors who prefer reduced motion.
+              - name: mediumImport
+                label: Import Medium articles
+                widget: boolean
+                required: false
+                default: false
+                hint: >-
+                  Pull your published Medium posts into the Articles section at
+                  build time. Needs the handle below.
+              - name: mediumHandle
+                label: Medium handle
+                widget: string
+                required: false
+                hint: 'Your Medium username without the @, e.g. pranavpatil. Only used when the import above is on.'
+
+  # ---------------------------------------------------------------------------
+  # Page layout — content/layout.json
+  # ---------------------------------------------------------------------------
+  - name: layout
+    label: Page Layout
+    label_singular: Page Layout
+    description: Drag sections into the order you want them on the home page.
+    files:
+      - name: layout
+        label: Page Layout
+        file: content/layout.json
+        fields:
+          - name: sections
+            label: Sections
+            widget: list
+            required: false
+            label_singular: Section
+            summary: '{{fields.sectionId}}'
+            hint: >-
+              Drag the handles to reorder the home page. Untick "Visible" to
+              hide a section without deleting it.
+            fields:
+              - name: sectionId
+                label: Section
+                widget: string
+                required: true
+                hint: >-
+                  Built-in sections are: hero, experience, projects, skills,
+                  articles, education, responsibilities, contact. For a custom
+                  section, use its file name from the Custom Sections
+                  collection.
+              - name: visible
+                label: Visible
+                widget: boolean
+                required: false
+                default: true
+                hint: Untick to hide this section from the site.
+
+  # ---------------------------------------------------------------------------
+  # Skills — content/skills.json
+  # ---------------------------------------------------------------------------
+  - name: skills
+    label: Skills
+    label_singular: Skills
+    description: Grouped skill lists shown in the Skills section.
+    files:
+      - name: skills
+        label: Skills
+        file: content/skills.json
+        fields:
+          - name: groups
+            label: Skill groups
+            widget: list
+            required: false
+            label_singular: Skill group
+            summary: '{{fields.label}}'
+            hint: One group per row of the Skills section. Drag to reorder.
+            fields:
+              - name: label
+                label: Group name
+                widget: string
+                required: true
+                hint: 'For example: Languages, Frameworks & Tools, Databases.'
+              - name: items
+                label: Skills
+                widget: list
+                required: false
+                field: { name: item, label: Skill, widget: string, required: true }
+                hint: One skill per entry. Drag to reorder.
+
+  # ---------------------------------------------------------------------------
+  # Experience — content/experience/*.md
+  # ---------------------------------------------------------------------------
+  - name: experience
+    label: Experience
+    label_singular: Role
+    description: Jobs and internships, shown as a timeline.
+    folder: content/experience
+    create: true
+    delete: true
+    extension: md
+    format: yaml-frontmatter
+    slug: '{{fields.company}}-{{fields.role}}'
+    summary: '{{fields.role}} — {{fields.company}}'
+    sortable_fields: ['order', 'start']
+    fields:
+      - name: role
+        label: Job title
+        widget: string
+        required: true
+        hint: 'For example: Software Engineer.'
+      - name: company
+        label: Company
+        widget: string
+        required: true
+      - name: location
+        label: Location
+        widget: string
+        required: false
+        default: ''
+        hint: 'For example: Abu Dhabi, UAE. Leave blank to hide it.'
+      - name: start
+        label: Start date
+        widget: datetime
+        required: true
+        format: 'YYYY-MM-DD'
+        date_format: 'YYYY-MM-DD'
+        time_format: false
+        picker_utc: true
+      - name: end
+        label: End date
+        widget: datetime
+        required: false
+        format: 'YYYY-MM-DD'
+        date_format: 'YYYY-MM-DD'
+        time_format: false
+        picker_utc: true
+        hint: >-
+          Leave completely blank for a role you are still in, and tick "Current
+          role" below. If the picker pre-fills today's date, clear it.
+      - name: current
+        label: Current role
+        widget: boolean
+        required: false
+        default: false
+        hint: Tick to show "Present" instead of an end date.
+      - name: bullets
+        label: Highlights
+        widget: list
+        required: false
+        field: { name: bullet, label: Highlight, widget: string, required: true }
+        hint: One achievement per entry. These are the bullet points under the role.
+      - name: tech
+        label: Technologies
+        widget: list
+        required: false
+        field: { name: item, label: Technology, widget: string, required: true }
+        hint: 'Shown as tags, e.g. Spring Boot, Kafka, PostgreSQL.'
+      - name: logo
+        label: Company logo
+        widget: image
+        required: false
+        hint: Optional. A square or wide logo on a transparent background works best.
+      - name: order
+        label: Sort order
+        widget: number
+        required: false
+        default: 0
+        value_type: int
+        hint: Lower numbers appear first. Use 1, 2, 3… Must not be left blank.
+      - name: body
+        label: Description
+        widget: markdown
+        required: false
+        hint: Optional longer description shown beneath the highlights.
+
+  # ---------------------------------------------------------------------------
+  # Projects — content/projects/*.md
+  # ---------------------------------------------------------------------------
+  - name: projects
+    label: Projects
+    label_singular: Project
+    description: Things you have built.
+    folder: content/projects
+    create: true
+    delete: true
+    extension: md
+    format: yaml-frontmatter
+    slug: '{{title}}'
+    summary: '{{fields.title}}'
+    sortable_fields: ['order', 'date']
+    fields:
+      - name: title
+        label: Title
+        widget: string
+        required: true
+      - name: summary
+        label: One-line summary
+        widget: text
+        required: true
+        hint: A sentence or two. This is what shows on the project card.
+      - name: tech
+        label: Technologies
+        widget: list
+        required: false
+        field: { name: item, label: Technology, widget: string, required: true }
+        hint: Shown as tags on the card.
+      - name: repo
+        label: Repository URL
+        widget: string
+        required: false
+        pattern:
+          - '^https?://.+'
+          - 'Must be a full URL starting with https://'
+        hint: >-
+          Optional. Must be a full URL or left completely blank — a half-typed
+          address will fail the build.
+      - name: demo
+        label: Live demo URL
+        widget: string
+        required: false
+        pattern:
+          - '^https?://.+'
+          - 'Must be a full URL starting with https://'
+        hint: >-
+          Optional. Must be a full URL or left completely blank — a half-typed
+          address will fail the build.
+      - name: cover
+        label: Cover image
+        widget: image
+        required: false
+        hint: Optional. Wide (16:9) images look best on the card.
+      - name: coverAlt
+        label: Cover image — alt text
+        widget: string
+        required: false
+        hint: >-
+          REQUIRED whenever you upload a cover image. Describe what the image
+          shows for people using a screen reader.
+      - name: featured
+        label: Featured
+        widget: boolean
+        required: false
+        default: false
+        hint: Tick to highlight this project ahead of the others.
+      - name: date
+        label: Date
+        widget: datetime
+        required: true
+        format: 'YYYY-MM-DD'
+        date_format: 'YYYY-MM-DD'
+        time_format: false
+        picker_utc: true
+        hint: Roughly when you built it. Used for sorting.
+      - name: order
+        label: Sort order
+        widget: number
+        required: false
+        default: 0
+        value_type: int
+        hint: Lower numbers appear first. Must not be left blank.
+      - name: body
+        label: Write-up
+        widget: markdown
+        required: false
+        hint: Optional longer description shown on the project page.
+
+  # ---------------------------------------------------------------------------
+  # Articles — content/articles/*.md
+  # ---------------------------------------------------------------------------
+  - name: articles
+    label: Articles
+    label_singular: Article
+    description: Posts written on this site. Medium posts are imported separately.
+    folder: content/articles
+    create: true
+    delete: true
+    extension: md
+    format: yaml-frontmatter
+    slug: '{{title}}'
+    summary: '{{fields.title}}'
+    sortable_fields: ['date', 'title']
+    fields:
+      - name: title
+        label: Title
+        widget: string
+        required: true
+      - name: excerpt
+        label: Excerpt
+        widget: text
+        required: false
+        default: ''
+        hint: A short teaser shown in the article list and in search results.
+      - name: date
+        label: Publication date
+        widget: datetime
+        required: true
+        format: 'YYYY-MM-DD'
+        date_format: 'YYYY-MM-DD'
+        time_format: false
+        picker_utc: true
+      - name: draft
+        label: Draft
+        widget: boolean
+        required: false
+        default: false
+        hint: >-
+          While this is ticked the article never appears on the live site. Untick
+          to publish.
+      - name: tags
+        label: Tags
+        widget: list
+        required: false
+        field: { name: tag, label: Tag, widget: string, required: true }
+      - name: cover
+        label: Cover image
+        widget: image
+        required: false
+      - name: coverAlt
+        label: Cover image — alt text
+        widget: string
+        required: false
+        hint: >-
+          REQUIRED whenever you upload a cover image. Describe what the image
+          shows for people using a screen reader.
+      - name: source
+        label: Source
+        widget: hidden
+        default: native
+        hint: Always "native" for articles written here. Managed automatically.
+      - name: canonicalUrl
+        label: Canonical URL
+        widget: string
+        required: false
+        pattern:
+          - '^https?://.+'
+          - 'Must be a full URL starting with https://'
+        hint: >-
+          Only if you published this somewhere else first — tells search engines
+          which copy is the original. Full URL or completely blank.
+      - name: externalUrl
+        label: External URL
+        widget: string
+        required: false
+        pattern:
+          - '^https?://.+'
+          - 'Must be a full URL starting with https://'
+        hint: >-
+          Rarely needed. Used by imported posts that live elsewhere. Full URL or
+          completely blank.
+      - name: hasFullText
+        label: Full text available here
+        widget: boolean
+        required: false
+        default: true
+        hint: >-
+          Leave ticked. Untick only for a teaser that links out instead of
+          showing the whole piece.
+      - name: body
+        label: Article
+        widget: markdown
+        required: false
+        hint: The article itself.
+
+  # ---------------------------------------------------------------------------
+  # Education — content/education/*.md
+  # ---------------------------------------------------------------------------
+  - name: education
+    label: Education
+    label_singular: Qualification
+    description: Degrees and schooling.
+    folder: content/education
+    create: true
+    delete: true
+    extension: md
+    format: yaml-frontmatter
+    slug: '{{fields.institution}}'
+    summary: '{{fields.degree}} — {{fields.institution}}'
+    sortable_fields: ['order', 'start']
+    fields:
+      - name: institution
+        label: Institution
+        widget: string
+        required: true
+        hint: 'The university, college or school name.'
+      - name: degree
+        label: Qualification
+        widget: string
+        required: true
+        hint: 'For example: B.Tech in Information & Communication Technology.'
+      - name: location
+        label: Location
+        widget: string
+        required: false
+        default: ''
+      - name: start
+        label: Start date
+        widget: datetime
+        required: true
+        format: 'YYYY-MM-DD'
+        date_format: 'YYYY-MM-DD'
+        time_format: false
+        picker_utc: true
+      - name: end
+        label: End date
+        widget: datetime
+        required: false
+        format: 'YYYY-MM-DD'
+        date_format: 'YYYY-MM-DD'
+        time_format: false
+        picker_utc: true
+        hint: >-
+          Leave completely blank if you are still studying. If the picker
+          pre-fills today's date, clear it.
+      - name: details
+        label: Details
+        widget: list
+        required: false
+        field: { name: detail, label: Detail, widget: string, required: true }
+        hint: 'One per entry — grades, coursework, honours.'
+      - name: order
+        label: Sort order
+        widget: number
+        required: false
+        default: 0
+        value_type: int
+        hint: Lower numbers appear first. Must not be left blank.
+      - name: body
+        label: Description
+        widget: markdown
+        required: false
+
+  # ---------------------------------------------------------------------------
+  # Positions of responsibility — content/responsibilities/*.md
+  # ---------------------------------------------------------------------------
+  - name: responsibilities
+    label: Positions of Responsibility
+    label_singular: Position
+    description: Leadership and volunteer roles outside of work.
+    folder: content/responsibilities
+    create: true
+    delete: true
+    extension: md
+    format: yaml-frontmatter
+    slug: '{{fields.organisation}}-{{fields.role}}'
+    summary: '{{fields.role}} — {{fields.organisation}}'
+    sortable_fields: ['order', 'start']
+    fields:
+      - name: role
+        label: Position
+        widget: string
+        required: true
+        hint: 'For example: Chairperson.'
+      - name: organisation
+        label: Organisation
+        widget: string
+        required: true
+        hint: 'The society, club or body. Note the British spelling — it must match exactly.'
+      - name: location
+        label: Location
+        widget: string
+        required: false
+        default: ''
+      - name: start
+        label: Start date
+        widget: datetime
+        required: true
+        format: 'YYYY-MM-DD'
+        date_format: 'YYYY-MM-DD'
+        time_format: false
+        picker_utc: true
+      - name: end
+        label: End date
+        widget: datetime
+        required: false
+        format: 'YYYY-MM-DD'
+        date_format: 'YYYY-MM-DD'
+        time_format: false
+        picker_utc: true
+        hint: >-
+          Leave completely blank if the position is ongoing. If the picker
+          pre-fills today's date, clear it.
+      - name: bullets
+        label: Highlights
+        widget: list
+        required: false
+        field: { name: bullet, label: Highlight, widget: string, required: true }
+        hint: One achievement per entry.
+      - name: order
+        label: Sort order
+        widget: number
+        required: false
+        default: 0
+        value_type: int
+        hint: Lower numbers appear first. Must not be left blank.
+      - name: body
+        label: Description
+        widget: markdown
+        required: false
+
+  # ---------------------------------------------------------------------------
+  # Custom sections — content/sections/*.md
+  # ---------------------------------------------------------------------------
+  - name: sections
+    label: Custom Sections
+    label_singular: Custom section
+    description: >-
+      Build a brand-new section — Talks, Awards, Certifications, anything —
+      without a code change. Pick a layout, add items, then add the section's
+      file name to Page Layout to make it appear.
+    folder: content/sections
+    create: true
+    delete: true
+    extension: md
+    format: yaml-frontmatter
+    slug: '{{title}}'
+    summary: '{{fields.title}} ({{fields.layout}})'
+    sortable_fields: ['order', 'title']
+    fields:
+      - name: title
+        label: Section heading
+        widget: string
+        required: true
+        hint: 'The heading shown on the page, e.g. Talks.'
+      - name: layout
+        label: Layout
+        widget: select
+        required: true
+        default: cards
+        options: ['cards', 'timeline', 'list', 'logo-grid']
+        hint: >-
+          cards = a grid of boxes · timeline = a dated vertical list ·
+          list = compact rows · logo-grid = images only, for logos or badges.
+      - name: order
+        label: Sort order
+        widget: number
+        required: false
+        default: 0
+        value_type: int
+        hint: Only orders custom sections among themselves. Must not be left blank.
+      - name: items
+        label: Items
+        widget: list
+        required: false
+        label_singular: Item
+        summary: '{{fields.title}}'
+        hint: The entries inside this section. Drag to reorder.
+        fields:
+          - name: title
+            label: Title
+            widget: string
+            required: true
+          - name: subtitle
+            label: Subtitle
+            widget: string
+            required: false
+            hint: 'Optional second line, e.g. the venue or issuing body.'
+          - name: date
+            label: Date
+            widget: string
+            required: false
+            hint: >-
+              Free text — write it however you like ("March 2025", "2024",
+              "Q3 2023"). Displayed exactly as typed.
+          - name: description
+            label: Description
+            widget: text
+            required: false
+          - name: image
+            label: Image
+            widget: image
+            required: false
+            hint: Optional. Required in practice for the logo-grid layout.
+          - name: imageAlt
+            label: Image — alt text
+            widget: string
+            required: false
+            hint: >-
+              REQUIRED whenever you upload an image. Describe what it shows for
+              people using a screen reader.
+          - name: tags
+            label: Tags
+            widget: list
+            required: false
+            field: { name: tag, label: Tag, widget: string, required: true }
+          - name: links
+            label: Links
+            widget: list
+            required: false
+            label_singular: Link
+            summary: '{{fields.label}}'
+            fields:
+              - name: label
+                label: Link text
+                widget: string
+                required: true
+                hint: 'What the link says, e.g. Watch the talk.'
+              - name: url
+                label: URL
+                widget: string
+                required: true
+                pattern:
+                  - '^https?://.+'
+                  - 'Must be a full URL starting with https://'
+      - name: body
+        label: Intro text
+        widget: markdown
+        required: false
+        hint: Optional paragraph shown under the section heading.

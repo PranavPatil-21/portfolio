@@ -1,15 +1,31 @@
 {
   "name": "Pranav Patil",
-  "roles": ["Software Engineer", "Backend & Distributed Systems", "AI Systems"],
+  "roles": [
+    "Software Engineer",
+    "Backend & Distributed Systems",
+    "AI Systems"
+  ],
   "bio": "Software engineer building backend systems for lending and payments at Wio Bank — Spring Boot microservices, Kafka-driven pipelines, and multi-agent AI systems. I like problems where correctness and throughput both matter.",
   "location": "Gurugram, India",
   "email": "pranavnarendrapatil.2104@gmail.com",
   "phone": "+91 7623955135",
   "resumePdf": "/uploads/resume.pdf",
   "socials": [
-    { "label": "GitHub", "url": "https://github.com/PranavPatil-21", "icon": "github" },
-    { "label": "LinkedIn", "url": "https://linkedin.com/in/pranav-patil", "icon": "linkedin" },
-    { "label": "Email", "url": "mailto:pranavnarendrapatil.2104@gmail.com", "icon": "mail" }
+    {
+      "label": "GitHub",
+      "url": "https://github.com/PranavPatil-21",
+      "icon": "github"
+    },
+    {
+      "label": "LinkedIn",
+      "url": "https://linkedin.com/in/pranav-patil",
+      "icon": "linkedin"
+    },
+    {
+      "label": "Email",
+      "url": "mailto:pranavnarendrapatil.2104@gmail.com",
+      "icon": "mail"
+    }
   ],
   "theme": {
     "accent": "#7c5cff",
@@ -25,5 +41,7 @@
     "hero3d": true,
     "mediumImport": false,
     "mediumHandle": ""
-  }
+  },
+  "avatar": "/uploads/profile.jpg",
+  "avatarAlt": "Pranav Patil"
 }

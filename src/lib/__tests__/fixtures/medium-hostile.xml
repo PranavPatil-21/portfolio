@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+<channel>
+<title><![CDATA[Stories by Pranav Patil on Medium]]></title>
+<description><![CDATA[Stories by Pranav Patil on Medium]]></description>
+<link>https://medium.com/@pranav</link>
+<item>
+<title><![CDATA[Totally Innocent Post]]></title>
+<link>https://medium.com/@pranav/totally-innocent-post-deadbeef0001?source=rss-abc123------2</link>
+<guid isPermaLink="false">deadbeef0001</guid>
+<category><![CDATA[security]]></category>
+<dc:creator><![CDATA[Pranav Patil]]></dc:creator>
+<pubDate>Mon, 03 Mar 2026 12:00:00 GMT</pubDate>
+<description><![CDATA[<p>An <b>innocent</b> summary.</p>]]></description>
+<content:encoded><![CDATA[<p>Benign paragraph with <strong>bold text</strong> that must survive.</p>
+<script>alert(1)</script>
+<img src="x" onerror="alert(2)" alt="broken">
+<a href="javascript:alert(3)">click me</a>
+<iframe src="https://evil.example.com/frame"></iframe>
+<div style="width: expression(alert(4))">styled</div>]]></content:encoded>
+</item>
+</channel>
+</rss>
