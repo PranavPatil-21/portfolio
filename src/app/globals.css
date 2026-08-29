@@ -13,22 +13,48 @@
  * assumes a dark background beyond the default numbers.
  */
 :root {
-  --accent: #5b8def;
-  /* Computed by `themeToCssVars` from the CMS palette so both clear WCAG AA
-     whatever colour is chosen: --accent-contrast is text ON the accent,
-     --accent-readable is the accent used AS text. */
-  --accent-contrast: #ffffff;
-  --accent-readable: var(--accent);
-  --background: #0b0c0e;
-  --foreground: #f2f4f7;
+  /*
+   * The active palette. `themeToCssVars` injects `--accent-dark` / `--accent-light`
+   * and friends onto <html> from the CMS; these lines choose between them, and
+   * the literals are the fallback when nothing is injected.
+   *
+   * Everything below is *derived* from the three actives with `color-mix`, so
+   * switching modes moves the whole surface treatment and never leaves a
+   * hardcoded grey behind that only looked right in one of them.
+   */
+  --accent: var(--accent-dark, #ff8c42);
+  --background: var(--background-dark, #0c0a09);
+  --foreground: var(--foreground-dark, #f5f2ef);
+  --accent-contrast: var(--accent-contrast-dark, #000000);
+  --accent-readable: var(--accent-readable-dark, #ff8c42);
 
-  /* Derived — never set these from the CMS. */
   --muted: color-mix(in oklab, var(--foreground) 76%, var(--background));
   --subtle: color-mix(in oklab, var(--foreground) 62%, var(--background));
   --hairline: color-mix(in oklab, var(--foreground) 12%, transparent);
   --surface: color-mix(in oklab, var(--foreground) 3.5%, transparent);
   --surface-strong: color-mix(in oklab, var(--foreground) 7%, transparent);
   --accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
+
+  color-scheme: dark;
+}
+
+/*
+ * Light mode. The accent is a different colour, not a lighter one: an accent
+ * chosen to glow on near-black scores 2.22:1 as text on white, well under AA.
+ */
+:root[data-theme='light'] {
+  --accent: var(--accent-light, #b03d09);
+  --background: var(--background-light, #fbfaf8);
+  --foreground: var(--foreground-light, #17130f);
+  --accent-contrast: var(--accent-contrast-light, #ffffff);
+  --accent-readable: var(--accent-readable-light, #b03d09);
+
+  /* Light surfaces need slightly more separation to read as distinct layers. */
+  --hairline: color-mix(in oklab, var(--foreground) 16%, transparent);
+  --surface: color-mix(in oklab, var(--foreground) 3%, transparent);
+  --surface-strong: color-mix(in oklab, var(--foreground) 6%, transparent);
+
+  color-scheme: light;
 }
 
 @theme inline {

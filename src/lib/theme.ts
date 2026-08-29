@@ -14,13 +14,30 @@ import type { Settings } from '@/content'
  * not itself a colour.
  */
 export function themeToCssVars(theme: Settings['theme']): Record<string, string> {
-  return {
-    '--accent': theme.accent,
-    '--background': theme.background,
-    '--foreground': theme.foreground,
-    '--accent-contrast': readableTextOn(theme.accent),
-    '--accent-readable': readableAccentOn(theme.accent, theme.background),
+  const vars: Record<string, string> = {
+    '--accent-dark': theme.accent,
+    '--background-dark': theme.background,
+    '--foreground-dark': theme.foreground,
+    '--accent-contrast-dark': readableTextOn(theme.accent),
+    '--accent-readable-dark': readableAccentOn(theme.accent, theme.background),
   }
+
+  /*
+   * Both palettes are emitted as separate variables and `globals.css` selects
+   * between them on `[data-theme]`. Emitting only the active one would mean the
+   * server had to know which mode the reader prefers, which it cannot — and
+   * guessing produces a flash of the wrong theme on every first load.
+   */
+  const light = theme.light
+  if (light) {
+    vars['--accent-light'] = light.accent
+    vars['--background-light'] = light.background
+    vars['--foreground-light'] = light.foreground
+    vars['--accent-contrast-light'] = readableTextOn(light.accent)
+    vars['--accent-readable-light'] = readableAccentOn(light.accent, light.background)
+  }
+
+  return vars
 }
 
 const AA_NORMAL_TEXT = 4.5

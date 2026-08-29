@@ -103,7 +103,20 @@ export const settingsSchema = z.object({
     accent: hexColour,
     background: hexColour,
     foreground: hexColour,
-    defaultMode: z.enum(['light', 'dark', 'system']).default('dark'),
+    defaultMode: z.enum(['light', 'dark', 'system']).default('system'),
+    /*
+     * The light palette needs its own three values rather than being derived.
+     * An accent chosen to glow on near-black almost never clears 4.5:1 as text
+     * on white — this site's orange scores 8.54 on the dark ground and 2.22 on
+     * the light one. Inverting a palette is a design decision, not arithmetic.
+     */
+    light: z
+      .object({
+        accent: hexColour,
+        background: hexColour,
+        foreground: hexColour,
+      })
+      .optional(),
   }),
   seo: z.object({
     title: z.string().min(1),
@@ -262,30 +275,56 @@ export const customSectionSchema = z.object({
 
 
 /**
- * A scripted, interactive walkthrough of a system doing its job.
+ * A system, described the way it would be defended in an interview.
  *
- * The site's one "show, don't tell" moment: rather than describing the
- * multi-agent investigator in a paragraph, the reader can run it. Content-driven
- * rather than hardcoded so the owner can rewrite the story — or point it at
- * different work entirely — from `/admin`.
+ * Each node answers the four questions that separate someone who built a system
+ * from someone who can only name its parts: what it does, why it exists at all,
+ * what was traded away to get it, and what breaks without it.
  */
-export const replayStepSchema = z.object({
-  actor: z.string().min(1),
-  action: z.string().min(1),
-  finding: optionalish(z.string()),
-  citation: optionalish(z.string()),
-  /** Milliseconds this step holds before the next begins during playback. */
-  hold: orderField,
+export const architectureNodeSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  kind: z.enum(['entry', 'stream', 'service', 'store', 'external']).default('service'),
+  does: z.string().min(1),
+  why: z.string().min(1),
+  tradeoff: optionalish(z.string()),
+  failure: optionalish(z.string()),
+  scale: optionalish(z.string()),
 })
 
-export const replaySchema = z.object({
+export const architectureEdgeSchema = z.object({
+  from: z.string().min(1),
+  to: z.string().min(1),
+  label: optionalish(z.string()),
+})
+
+/**
+ * A path through the system for one real situation.
+ *
+ * The map alone shows what exists; a journey shows what *happens* — and the
+ * product decision taken at each hop. This is the difference between naming
+ * components and demonstrating you understand the product they serve.
+ */
+export const journeyStepSchema = z.object({
+  node: z.string().min(1),
+  what: z.string().min(1),
+  decision: optionalish(z.string()),
+})
+
+export const journeySchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  summary: optionalish(z.string()),
+  steps: z.array(journeyStepSchema).default([]),
+})
+
+export const architectureSchema = z.object({
   enabled: z.boolean().default(false),
   title: z.string().default(''),
   intro: z.string().default(''),
-  trigger: z.string().default(''),
-  incident: z.string().default(''),
-  steps: z.array(replayStepSchema).default([]),
-  conclusion: z.string().default(''),
+  nodes: z.array(architectureNodeSchema).default([]),
+  edges: z.array(architectureEdgeSchema).default([]),
+  journeys: z.array(journeySchema).default([]),
 })
 
 export const layoutEntrySchema = z.object({
@@ -308,7 +347,10 @@ export type Responsibility = z.infer<typeof responsibilitySchema>
 export type CustomItem = z.infer<typeof customItemSchema>
 export type CustomSection = z.infer<typeof customSectionSchema>
 export type Metric = z.infer<typeof metricSchema>
-export type ReplayStep = z.infer<typeof replayStepSchema>
-export type Replay = z.infer<typeof replaySchema>
+export type ArchitectureNode = z.infer<typeof architectureNodeSchema>
+export type ArchitectureEdge = z.infer<typeof architectureEdgeSchema>
+export type JourneyStep = z.infer<typeof journeyStepSchema>
+export type Journey = z.infer<typeof journeySchema>
+export type Architecture = z.infer<typeof architectureSchema>
 export type LayoutEntry = z.infer<typeof layoutEntrySchema>
 export type Link = z.infer<typeof linkSchema>

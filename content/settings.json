@@ -1,11 +1,11 @@
 {
   "name": "Pranav Patil",
-  "headline": "I build the lending and credit systems behind *Wio Bank*'s Retail and SME products — and the *multi-agent AI* that investigates them when they break.",
-  "bio": "What holds my attention is the *decision* behind a system — who it is for, what breaks without it, and which constraint you refuse to trade away. I'm an engineer moving toward product roles where *AI is the product, not the garnish*.",
+  "headline": "I build the lending and credit systems behind *Wio Bank*'s Retail and SME products \u2014 and the *multi-agent AI* that investigates them when they break.",
+  "bio": "What holds my attention is the *decision* behind a system \u2014 who it is for, what breaks without it, and which constraint you refuse to trade away. I'm an engineer moving toward product roles where *AI is the product, not the garnish*.",
   "roles": [
     "Software Engineer, moving toward Product",
     "Multi-Agent AI Systems",
-    "Fintech — Lending, Credit & Payments"
+    "Fintech \u2014 Lending, Credit & Payments"
   ],
   "location": "Gurugram, India",
   "email": "pranavnarendrapatil.2104@gmail.com",
@@ -34,11 +34,16 @@
     "accent": "#ff8c42",
     "background": "#0c0a09",
     "foreground": "#f5f2ef",
-    "defaultMode": "dark"
+    "defaultMode": "system",
+    "light": {
+      "accent": "#b03d09",
+      "background": "#fbfaf8",
+      "foreground": "#17130f"
+    }
   },
   "seo": {
-    "title": "Pranav Patil — Engineer building AI and fintech products",
-    "description": "Software engineer at Wio Bank building lending and payments systems, and WioGenie — a multi-agent AI incident investigator with citation-backed reasoning."
+    "title": "Pranav Patil \u2014 Engineer building AI and fintech products",
+    "description": "Software engineer at Wio Bank building lending and payments systems, and WioGenie \u2014 a multi-agent AI incident investigator with citation-backed reasoning."
   },
   "features": {
     "hero3d": true,

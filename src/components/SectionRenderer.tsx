@@ -9,7 +9,7 @@ import type {
   CustomSection as CustomSectionType,
   LayoutEntry,
   Metric,
-  Replay,
+  Architecture,
 } from '@/content'
 
 import CurrentRole from '@/components/sections/CurrentRole'
@@ -22,7 +22,7 @@ import Contact from '@/components/sections/Contact'
 import Articles from '@/components/sections/Articles'
 import CustomSection from '@/components/sections/CustomSection'
 import Metrics from '@/components/sections/Metrics'
-import IncidentReplay from '@/components/sections/IncidentReplay'
+import SystemMap from '@/components/sections/SystemMap'
 
 export type SiteContent = {
   settings: Settings
@@ -33,7 +33,7 @@ export type SiteContent = {
   responsibilities: Responsibility[]
   articles: Article[]
   metrics: Metric[]
-  replay: Replay | null
+  architecture: Architecture | null
   customSections: CustomSectionType[]
 }
 
@@ -95,8 +95,8 @@ function renderSection(
       const role = c.experience.find((e) => e.current) ?? c.experience[0]
       return role ? <CurrentRole role={role} settings={c.settings} /> : null
     }
-    case 'replay':
-      return c.replay ? <IncidentReplay replay={c.replay} /> : null
+    case 'architecture':
+      return c.architecture ? <SystemMap architecture={c.architecture} /> : null
     case 'metrics':
       return <Metrics items={c.metrics} />
     case 'experience':

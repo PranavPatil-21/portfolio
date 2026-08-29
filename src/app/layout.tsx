@@ -48,11 +48,33 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
+      /*
+       * The boot script below sets `data-theme` on this element before React
+       * hydrates, so the server markup and the client DOM legitimately differ
+       * by that one attribute. Suppressing here is the intended escape hatch —
+       * the alternative is either a hydration error on every load or a flash of
+       * the wrong theme, and neither is acceptable.
+       */
+      suppressHydrationWarning
       // The CMS-chosen palette is injected as CSS custom properties here, at the
       // root, so every derived design token downstream resolves against it.
       style={themeToCssVars(settings.theme) as React.CSSProperties}
       className={`${inter.variable} ${playfair.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/*
+          Runs before first paint, so the correct theme is painted once rather
+          than painted wrong and corrected. Deliberately duplicates the logic in
+          `ThemeToggle.resolveTheme` — React is not available this early, and a
+          flash of the wrong background is the one bug a theme switch cannot
+          have. Kept to a few lines precisely so the duplication stays checkable.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var m=localStorage.getItem('theme')||'system';var d=m==='system'?(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):m;document.documentElement.dataset.theme=d;}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className="flex min-h-full flex-col bg-[var(--background)] text-[var(--foreground)]">
         <a
           href="#main"

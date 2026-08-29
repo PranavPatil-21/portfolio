@@ -10,7 +10,7 @@ import {
   customSectionSchema,
   layoutSchema,
   metricsSchema,
-  replaySchema,
+  architectureSchema,
 } from './schemas'
 import type {
   Settings,
@@ -23,7 +23,7 @@ import type {
   CustomSection,
   LayoutEntry,
   Metric,
-  Replay,
+  Architecture,
 } from './schemas'
 
 export * from './schemas'
@@ -81,11 +81,11 @@ export function getMetrics(): Metric[] {
   }
 }
 
-/** The interactive walkthrough. Absent file is valid — the section omits. */
-export function getReplay(): Replay | null {
+/** The system map. Absent file is valid — the section simply omits. */
+export function getArchitecture(): Architecture | null {
   try {
-    const replay = readJson('replay.json', replaySchema)
-    return replay.enabled && replay.steps.length > 0 ? replay : null
+    const architecture = readJson('architecture.json', architectureSchema)
+    return architecture.enabled && architecture.nodes.length > 0 ? architecture : null
   } catch {
     return null
   }
