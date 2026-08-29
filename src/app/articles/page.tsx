@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import TopBar from '@/components/TopBar'
 import Link from 'next/link'
 import { getNativeArticles, getSettings } from '@/content'
 import { getAllArticles } from '@/lib/articles'
@@ -19,7 +18,6 @@ export default async function ArticlesPage() {
 
   return (
     <>
-      <TopBar settings={getSettings()} variant="sub" />
       {/* Same container and type scale as /work — the two sub-pages are peers
           and reading like different sites is what made them feel unfinished. */}
       <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">

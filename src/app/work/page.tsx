@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import TopBar from '@/components/TopBar'
 import Link from 'next/link'
 import { getNativeArticles, getProjects, getSettings } from '@/content'
 import type { Project } from '@/content'
@@ -129,7 +128,6 @@ export default function WorkPage() {
 
   return (
     <>
-      <TopBar settings={getSettings()} variant="sub" showWriting={getNativeArticles().length > 0} />
       <main id="main" className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <header className="max-w-2xl">
         <p className="eyebrow">Case studies</p>

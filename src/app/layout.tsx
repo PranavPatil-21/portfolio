@@ -5,6 +5,9 @@ import './globals.css'
 import { getSettings } from '@/content'
 import { themeToCssVars } from '@/lib/theme'
 import JsonLd from '@/components/JsonLd'
+import SiteHeader from '@/components/SiteHeader'
+import { getNavSections } from '@/lib/nav'
+import { getAllArticles } from '@/lib/articles'
 
 const inter = Inter({ variable: '--font-inter', subsets: ['latin'], display: 'swap' })
 /* Playfair carries the outlined-italic headings; only the italic face is used. */
@@ -42,8 +45,10 @@ export function generateMetadata(): Metadata {
   }
 }
 
-export default function RootLayout({ children }: LayoutProps<'/'>) {
+export default async function RootLayout({ children }: LayoutProps<'/'>) {
   const settings = getSettings()
+  const sections = await getNavSections()
+  const showWriting = (await getAllArticles()).length > 0
 
   return (
     <html
@@ -83,6 +88,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           Skip to content
         </a>
         <JsonLd settings={settings} />
+        <SiteHeader settings={settings} showWriting={showWriting} sections={sections} />
         {children}
       </body>
     </html>

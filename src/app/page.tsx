@@ -16,7 +16,6 @@ import SideRail from '@/components/SideRail'
 import Spotlight from '@/components/Spotlight'
 import ScrollProgress from '@/components/ScrollProgress'
 import CommandPalette, { type CommandItem } from '@/components/CommandPalette'
-import TopBar from '@/components/TopBar'
 import SectionRenderer from '@/components/SectionRenderer'
 
 /**
@@ -130,12 +129,6 @@ export default async function Home() {
   return (
     <>
       <ScrollProgress />
-      <TopBar
-        settings={settings}
-        variant="home"
-        sections={navSections}
-        showWriting={articles.length > 0}
-      />
       <Spotlight />
       <CommandPalette items={commandItems} />
 
