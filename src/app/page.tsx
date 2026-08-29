@@ -15,6 +15,7 @@ import Nav from '@/components/Nav'
 import SmoothScroll from '@/components/SmoothScroll'
 import Cursor from '@/components/Cursor'
 import Grain from '@/components/Grain'
+import Backdrop from '@/components/Backdrop'
 import Footer from '@/components/Footer'
 import SectionRenderer from '@/components/SectionRenderer'
 
@@ -53,6 +54,7 @@ export default async function Home() {
         smooth scroll and the cursor, coarse pointers for the cursor — so none
         of them needs a second guard here.
       */}
+      <Backdrop enabled={settings.features.hero3d} />
       <SmoothScroll />
       <Cursor />
       <Grain />

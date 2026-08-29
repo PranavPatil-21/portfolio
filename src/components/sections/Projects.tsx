@@ -2,6 +2,7 @@ import { SectionShell } from '@/components/ui/SectionShell'
 import { Card } from '@/components/ui/Card'
 import { Tag } from '@/components/ui/Tag'
 import { Reveal } from '@/components/ui/Reveal'
+import Tilt from '@/components/ui/Tilt'
 import { formatDate } from './Experience'
 import type { Project } from '@/content/schemas'
 
@@ -49,6 +50,7 @@ export function Projects({ items }: { items: Project[] }) {
         {items.map((item, i) => (
           <li key={item.slug || item.title} className={LIFT}>
             <Reveal delay={i * 0.06} className="h-full">
+              <Tilt className="h-full">
               <Card className="group h-full overflow-hidden">
                 <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
                   {item.cover ? (
@@ -134,6 +136,7 @@ export function Projects({ items }: { items: Project[] }) {
                   </div>
                 </div>
               </Card>
+              </Tilt>
             </Reveal>
           </li>
         ))}

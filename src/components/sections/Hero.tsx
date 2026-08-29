@@ -5,8 +5,8 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import type { Settings } from '@/content'
-import HeroCanvas from '@/components/three/HeroCanvas'
 import BlurText from '@/components/ui/BlurText'
+import Magnetic from '@/components/ui/Magnetic'
 
 /**
  * The hero.
@@ -30,7 +30,7 @@ import BlurText from '@/components/ui/BlurText'
  * reveals it) is the same animation and a far worse failure mode.
  */
 export default function Hero({ settings }: { settings: Settings }) {
-  const { name, roles, bio, location, email, resumePdf, socials, features } = settings
+  const { name, roles, bio, location, email, resumePdf, socials } = settings
 
   // The CMS clears a text field to `''`, not to nothing, so "set" has to mean
   // non-empty — otherwise clearing the field publishes a link to the site root.
@@ -53,9 +53,6 @@ export default function Hero({ settings }: { settings: Settings }) {
         a subject beside the copy rather than a wash behind it. On narrow
         screens it fills the section and the scrims below carry legibility.
       */}
-      <div className="absolute inset-0 lg:left-[38%]">
-        <HeroCanvas enabled={features.hero3d} />
-      </div>
 
       {/*
         Three scrims, because the particle portrait is bright in places and text
@@ -125,20 +122,24 @@ export default function Hero({ settings }: { settings: Settings }) {
             <HeroBio paragraphs={paragraphs} />
 
             <div className="hero-supporting mt-10 flex flex-wrap items-center gap-x-3 gap-y-3">
-              <a
-                href={`mailto:${email}`}
-                className="rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--accent-contrast)] transition hover:opacity-90 motion-reduce:transition-none"
-              >
-                Get in touch
-              </a>
+              <Magnetic>
+                <a
+                  href={`mailto:${email}`}
+                  className="inline-block rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--accent-contrast)] transition hover:opacity-90 motion-reduce:transition-none"
+                >
+                  Get in touch
+                </a>
+              </Magnetic>
 
               {resumeHref ? (
-                <a
-                  href={resumeHref}
-                  className="rounded-full border border-[var(--hairline)] px-6 py-3 text-sm font-medium transition hover:border-[var(--accent)] motion-reduce:transition-none"
-                >
-                  Download résumé
-                </a>
+                <Magnetic>
+                  <a
+                    href={resumeHref}
+                    className="inline-block rounded-full border border-[var(--hairline)] px-6 py-3 text-sm font-medium transition hover:border-[var(--accent)] motion-reduce:transition-none"
+                  >
+                    Download résumé
+                  </a>
+                </Magnetic>
               ) : null}
 
               {socials.map((social) => (

@@ -53,9 +53,6 @@ vi.mock('gsap/ScrollTrigger', () => ({
 }))
 
 // The particle portrait pulls in `three`; it has its own test file.
-vi.mock('@/components/three/HeroCanvas', () => ({
-  default: () => <div data-testid="hero-canvas" />,
-}))
 
 import Hero from '../Hero'
 
@@ -161,10 +158,9 @@ describe('Hero — content is server-rendered DOM', () => {
     expect(paragraphs).toHaveLength(2)
   })
 
-  it('keeps the section id and mounts the canvas', () => {
+  it('keeps the section id', () => {
     const { container } = render(<Hero settings={makeSettings()} />)
     expect(container.querySelector('section#hero')).not.toBeNull()
-    expect(screen.getByTestId('hero-canvas')).toBeInTheDocument()
   })
 })
 
