@@ -11,7 +11,6 @@ import type {
   Metric,
 } from '@/content'
 
-import Hero from '@/components/sections/Hero'
 import CurrentRole from '@/components/sections/CurrentRole'
 import Experience from '@/components/sections/Experience'
 import Projects from '@/components/sections/Projects'
@@ -77,7 +76,12 @@ function renderSection(
 ) {
   switch (id) {
     case 'hero':
-      return <Hero settings={c.settings} />
+      /*
+       * Rendered by the sticky rail, not in the scrolling column. The layout
+       * entry is kept so the owner still sees `hero` in the CMS ordering list
+       * and cannot be confused by its absence.
+       */
+      return null
     case 'current': {
       /*
        * The role the owner holds today, given its own featured block rather

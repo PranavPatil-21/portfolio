@@ -3,11 +3,15 @@ import type { ReactNode } from 'react'
 /**
  * The frame every section sits in.
  *
- * A small mono eyebrow, a restrained heading, and an optional one-line summary.
- * The previous version paired an outlined italic serif with a display-weight
- * sans at 8vw — striking, and it pushed the actual evidence below the fold. A
- * reader skimming for thirty seconds should be reading substance by the time
- * they finish the heading, not still reading the heading.
+ * Sized for the scrolling content column beside the sticky rail, so it carries
+ * no page-level centering of its own. On narrow screens the rail stacks above
+ * and this simply becomes the page.
+ *
+ * The heading is ONE `<h2>`, restyled across breakpoints — a small sticky label
+ * on mobile, a full heading on desktop. An earlier version rendered two copies
+ * and hid one per breakpoint, which meant the accessible heading was
+ * `display: none` on desktop: `aria-labelledby` pointed at a hidden node and a
+ * screen reader got no heading at all.
  */
 export function SectionShell({
   id,
@@ -30,27 +34,26 @@ export function SectionShell({
   const label = eyebrow ?? index
 
   return (
-    <section
-      id={id}
-      aria-labelledby={headingId}
-      className="scroll-mt-20 border-t border-[var(--hairline)] px-6 py-16 sm:px-8 md:py-24"
-    >
-      <div className="mx-auto w-full max-w-5xl">
-        <header className="mb-10 flex flex-wrap items-end justify-between gap-x-8 gap-y-4 md:mb-14">
-          <div className="max-w-2xl">
-            {label ? <p className="eyebrow mb-3">{label}</p> : null}
-            <h2 id={headingId} className="heading">
-              {title}
-            </h2>
-            {subtitle ? (
-              <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">{subtitle}</p>
-            ) : null}
-          </div>
-          {action ? <div className="shrink-0">{action}</div> : null}
-        </header>
-
-        {children}
+    <section id={id} aria-labelledby={headingId} className="scroll-mt-16 py-14 first:pt-0 md:py-20">
+      <div className="sticky top-0 z-20 -mx-6 mb-6 bg-[var(--background)]/85 px-6 py-4 backdrop-blur-sm lg:static lg:mx-0 lg:mb-8 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+        {label ? <p className="eyebrow mb-3 hidden lg:block">{label}</p> : null}
+        <h2
+          id={headingId}
+          className="font-mono text-[11px] tracking-[0.16em] text-[var(--subtle)] uppercase lg:font-sans lg:text-[clamp(1.5rem,2.6vw,2.125rem)] lg:leading-[1.12] lg:font-semibold lg:tracking-[-0.02em] lg:text-[var(--foreground)] lg:normal-case"
+        >
+          {title}
+        </h2>
       </div>
+
+      {subtitle ? (
+        <p className="mb-10 hidden max-w-xl text-[15px] leading-relaxed text-[var(--muted)] lg:block">
+          {subtitle}
+        </p>
+      ) : null}
+
+      {children}
+
+      {action ? <div className="mt-8">{action}</div> : null}
     </section>
   )
 }
