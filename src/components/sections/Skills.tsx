@@ -18,7 +18,7 @@ export function Skills({ groups }: { groups: SkillGroup[] }) {
         {groups.map((group, i) => (
           <Reveal key={group.label} delay={i * 0.06} className="h-full">
             <Card className="h-full">
-              <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-[color:var(--accent)]">
+              <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-[color:var(--accent-readable)]">
                 {group.label}
               </h3>
               {group.items.length > 0 ? (

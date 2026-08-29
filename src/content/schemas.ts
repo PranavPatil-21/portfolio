@@ -25,6 +25,18 @@ const dateish = z.preprocess(
   z.string().regex(/^\d{4}(-\d{2})?(-\d{2})?$/, 'use YYYY, YYYY-MM or YYYY-MM-DD'),
 )
 
+/**
+ * Makes a field optional in the way a *CMS* means it.
+ *
+ * Zod's `.optional()` accepts an absent key, but a browser form clears a field
+ * to `""`, not to nothing. Without this, clearing an end date or deleting a
+ * repo URL in `/admin` publishes `end: ''`, which fails validation and breaks
+ * the build — a trap laid precisely where the owner is most likely to step.
+ */
+function optionalish<T extends z.ZodTypeAny>(schema: T) {
+  return z.preprocess((v) => (v === '' ? undefined : v), schema.optional())
+}
+
 const linkSchema = z.object({
   label: z.string().min(1),
   url: z.string().url(),
@@ -42,10 +54,10 @@ export const settingsSchema = z.object({
   bio: z.string().min(1),
   location: z.string().default(''),
   email: z.string().email(),
-  phone: z.string().optional(),
-  avatar: z.string().optional(),
-  avatarAlt: z.string().optional(),
-  resumePdf: z.string().optional(),
+  phone: optionalish(z.string()),
+  avatar: optionalish(z.string()),
+  avatarAlt: optionalish(z.string()),
+  resumePdf: optionalish(z.string()),
   socials: z.array(socialSchema).default([]),
   theme: z.object({
     accent: hexColour,
@@ -56,12 +68,12 @@ export const settingsSchema = z.object({
   seo: z.object({
     title: z.string().min(1),
     description: z.string().min(1),
-    ogImage: z.string().optional(),
+    ogImage: optionalish(z.string()),
   }),
   features: z.object({
     hero3d: z.boolean().default(true),
     mediumImport: z.boolean().default(false),
-    mediumHandle: z.string().optional(),
+    mediumHandle: optionalish(z.string()),
   }),
 })
 
@@ -71,11 +83,11 @@ export const experienceSchema = z.object({
   company: z.string().min(1),
   location: z.string().default(''),
   start: dateish,
-  end: dateish.optional(),
+  end: optionalish(dateish),
   current: z.boolean().default(false),
   bullets: z.array(z.string().min(1)).default([]),
   tech: z.array(z.string().min(1)).default([]),
-  logo: z.string().optional(),
+  logo: optionalish(z.string()),
   order: z.number().default(0),
   body: z.string().default(''),
 })
@@ -86,10 +98,10 @@ export const projectSchema = z.object({
   summary: z.string().min(1),
   body: z.string().default(''),
   tech: z.array(z.string().min(1)).default([]),
-  repo: z.string().url().optional(),
-  demo: z.string().url().optional(),
-  cover: z.string().optional(),
-  coverAlt: z.string().optional(),
+  repo: optionalish(z.string().url()),
+  demo: optionalish(z.string().url()),
+  cover: optionalish(z.string()),
+  coverAlt: optionalish(z.string()),
   featured: z.boolean().default(false),
   date: dateish,
   order: z.number().default(0),
@@ -100,14 +112,14 @@ export const articleSchema = z.object({
   title: z.string().min(1),
   excerpt: z.string().default(''),
   body: z.string().default(''),
-  cover: z.string().optional(),
-  coverAlt: z.string().optional(),
+  cover: optionalish(z.string()),
+  coverAlt: optionalish(z.string()),
   tags: z.array(z.string().min(1)).default([]),
   date: dateish,
   draft: z.boolean().default(false),
   source: z.enum(['native', 'medium']).default('native'),
-  canonicalUrl: z.string().url().optional(),
-  externalUrl: z.string().url().optional(),
+  canonicalUrl: optionalish(z.string().url()),
+  externalUrl: optionalish(z.string().url()),
   hasFullText: z.boolean().default(true),
 })
 
@@ -126,7 +138,7 @@ export const educationSchema = z.object({
   degree: z.string().min(1),
   location: z.string().default(''),
   start: dateish,
-  end: dateish.optional(),
+  end: optionalish(dateish),
   details: z.array(z.string().min(1)).default([]),
   order: z.number().default(0),
   body: z.string().default(''),
@@ -138,7 +150,7 @@ export const responsibilitySchema = z.object({
   organisation: z.string().min(1),
   location: z.string().default(''),
   start: dateish,
-  end: dateish.optional(),
+  end: optionalish(dateish),
   bullets: z.array(z.string().min(1)).default([]),
   order: z.number().default(0),
   body: z.string().default(''),
@@ -146,11 +158,11 @@ export const responsibilitySchema = z.object({
 
 export const customItemSchema = z.object({
   title: z.string().min(1),
-  subtitle: z.string().optional(),
-  date: z.string().optional(),
-  description: z.string().optional(),
-  image: z.string().optional(),
-  imageAlt: z.string().optional(),
+  subtitle: optionalish(z.string()),
+  date: optionalish(z.string()),
+  description: optionalish(z.string()),
+  image: optionalish(z.string()),
+  imageAlt: optionalish(z.string()),
   tags: z.array(z.string().min(1)).default([]),
   links: z.array(linkSchema).default([]),
 })

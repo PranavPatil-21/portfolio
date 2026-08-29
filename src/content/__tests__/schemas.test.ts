@@ -4,6 +4,7 @@ import {
   experienceSchema,
   articleSchema,
   customSectionSchema,
+  projectSchema,
 } from '../schemas'
 
 const validSettings = {
@@ -119,5 +120,40 @@ describe('customSectionSchema', () => {
       customSectionSchema.safeParse({ title: 'Talks', layout: 'carousel' })
         .success,
     ).toBe(false)
+  })
+})
+
+describe('CMS empty-string tolerance', () => {
+  it('treats a cleared end date as absent, not as invalid', () => {
+    const r = experienceSchema.safeParse({
+      role: 'SWE', company: 'Wio', start: '2024-09', end: '',
+    })
+    expect(r.success).toBe(true)
+    if (r.success) expect(r.data.end).toBeUndefined()
+  })
+
+  it('treats a cleared URL field as absent', () => {
+    const r = projectSchema.safeParse({
+      title: 'X', summary: 'Y', date: '2024-01', repo: '', demo: '',
+    })
+    expect(r.success).toBe(true)
+    if (r.success) {
+      expect(r.data.repo).toBeUndefined()
+      expect(r.data.demo).toBeUndefined()
+    }
+  })
+
+  it('still rejects a genuinely malformed URL', () => {
+    expect(
+      projectSchema.safeParse({
+        title: 'X', summary: 'Y', date: '2024-01', repo: 'not-a-url',
+      }).success,
+    ).toBe(false)
+  })
+
+  it('treats a cleared optional settings field as absent', () => {
+    const r = settingsSchema.safeParse({ ...validSettings, phone: '', resumePdf: '' })
+    expect(r.success).toBe(true)
+    if (r.success) expect(r.data.phone).toBeUndefined()
   })
 })

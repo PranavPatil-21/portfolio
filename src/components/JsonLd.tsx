@@ -35,8 +35,11 @@ export default function JsonLd({ settings }: { settings: Settings }) {
   return (
     <script
       type="application/ld+json"
-      // Content is JSON-serialised from validated settings, never raw HTML.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }}
+      // JSON-serialised from validated settings, never raw HTML. `<` is escaped
+      // because the bio is free text — a stray `</script` would end the tag.
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(person).replace(/</g, '\\u003c'),
+      }}
     />
   )
 }

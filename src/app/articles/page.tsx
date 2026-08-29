@@ -44,7 +44,7 @@ export default function ArticlesPage() {
       <p className="mt-14">
         <Link
           href="/"
-          className="text-sm font-medium text-[color:var(--accent)] underline underline-offset-4 decoration-[color:var(--accent)]/40 hover:decoration-[color:var(--accent)]"
+          className="text-sm font-medium text-[color:var(--accent-readable)] underline underline-offset-4 decoration-[color:var(--accent)]/40 hover:decoration-[color:var(--accent)]"
         >
           ← Back home
         </Link>

@@ -37,7 +37,7 @@ export default function Hero({ settings }: { settings: Settings }) {
         ) : null}
 
         {location ? (
-          <p className="mb-5 text-sm font-medium tracking-[0.18em] text-[var(--accent)] uppercase">
+          <p className="mb-5 text-sm font-medium tracking-[0.18em] text-[var(--accent-readable)] uppercase">
             {location}
           </p>
         ) : null}
@@ -60,7 +60,7 @@ export default function Hero({ settings }: { settings: Settings }) {
         <div className="mt-10 flex flex-wrap items-center gap-3">
           <a
             href={`mailto:${email}`}
-            className="rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:outline-none"
+            className="rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--accent-contrast)] transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             Get in touch
           </a>

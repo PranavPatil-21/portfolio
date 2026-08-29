@@ -89,7 +89,7 @@ export default async function ArticlePage({
                 href={article.canonicalUrl}
                 target="_blank"
                 rel="noopener noreferrer canonical"
-                className="text-[color:var(--accent)] underline underline-offset-4"
+                className="text-[color:var(--accent-readable)] underline underline-offset-4"
               >
                 the original source
               </a>
@@ -104,7 +104,7 @@ export default async function ArticlePage({
       <p className="mt-16 border-t border-[color:var(--foreground)]/10 pt-8">
         <Link
           href="/articles"
-          className="text-sm font-medium text-[color:var(--accent)] underline underline-offset-4 decoration-[color:var(--accent)]/40 hover:decoration-[color:var(--accent)]"
+          className="text-sm font-medium text-[color:var(--accent-readable)] underline underline-offset-4 decoration-[color:var(--accent)]/40 hover:decoration-[color:var(--accent)]"
         >
           ← All articles
         </Link>

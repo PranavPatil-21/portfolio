@@ -5,7 +5,7 @@ import { getNativeArticles } from '@/content'
  * The absolute origin the site is served from. Read from the environment so the
  * domain is never hardcoded — set `NEXT_PUBLIC_SITE_URL` in Vercel once.
  */
-export function siteUrl(): string {
+function siteUrl(): string {
   return (
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ??
     'http://localhost:3000'

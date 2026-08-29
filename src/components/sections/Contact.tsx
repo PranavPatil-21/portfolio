@@ -4,7 +4,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import type { Settings } from '@/content/schemas'
 
 const LINK =
-  'inline-flex items-center gap-2 rounded-full border border-hairline bg-surface-strong px-4 py-2 text-sm font-medium text-[color:var(--foreground)] transition-colors hover:border-accent/50 hover:text-[color:var(--accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]'
+  'inline-flex items-center gap-2 rounded-full border border-hairline bg-surface-strong px-4 py-2 text-sm font-medium text-[color:var(--foreground)] transition-colors hover:border-accent/50 hover:text-[color:var(--accent-readable)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]'
 
 /**
  * The closing section: how to reach the owner.
@@ -34,7 +34,7 @@ export function Contact({ settings }: { settings: Settings }) {
               <dd className="mt-2">
                 <a
                   href={`mailto:${email}`}
-                  className="rounded text-base text-[color:var(--accent)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                  className="rounded text-base text-[color:var(--accent-readable)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                 >
                   {email}
                 </a>
@@ -86,7 +86,7 @@ export function Contact({ settings }: { settings: Settings }) {
                   <a
                     href={resumePdf}
                     download
-                    className={`${LINK} border-accent/50 text-[color:var(--accent)]`}
+                    className={`${LINK} border-accent/50 text-[color:var(--accent-readable)]`}
                   >
                     Download resume
                     <span className="sr-only"> — {name}, PDF</span>

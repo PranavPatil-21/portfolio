@@ -41,14 +41,14 @@ export function ArticleCard({ article }: { article: Article }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="after:absolute after:inset-0 hover:text-[color:var(--accent)]"
+      className="after:absolute after:inset-0 hover:text-[color:var(--accent-readable)]"
     >
       {article.title}
     </a>
   ) : (
     <Link
       href={href}
-      className="after:absolute after:inset-0 hover:text-[color:var(--accent)]"
+      className="after:absolute after:inset-0 hover:text-[color:var(--accent-readable)]"
     >
       {article.title}
     </Link>
@@ -59,7 +59,7 @@ export function ArticleCard({ article }: { article: Article }) {
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs uppercase tracking-wider text-[color:var(--foreground)]/55">
         <time dateTime={article.date}>{formatArticleDate(article.date)}</time>
         {external ? (
-          <span className="rounded-full border border-[color:var(--accent)]/40 px-2 py-0.5 normal-case tracking-normal text-[color:var(--accent)]">
+          <span className="rounded-full border border-[color:var(--accent)]/40 px-2 py-0.5 normal-case tracking-normal text-[color:var(--accent-readable)]">
             Hosted on Medium
           </span>
         ) : null}
@@ -87,7 +87,7 @@ export function ArticleCard({ article }: { article: Article }) {
 
       <span
         aria-hidden
-        className="text-sm font-medium text-[color:var(--accent)] transition-transform group-hover:translate-x-0.5"
+        className="text-sm font-medium text-[color:var(--accent-readable)] transition-transform group-hover:translate-x-0.5"
       >
         {external ? 'Read on Medium →' : 'Read article →'}
       </span>
@@ -126,7 +126,7 @@ export default function Articles({
       <p className="mt-8">
         <Link
           href="/articles"
-          className="inline-flex items-center gap-2 text-sm font-medium text-[color:var(--accent)] underline underline-offset-4 decoration-[color:var(--accent)]/40 hover:decoration-[color:var(--accent)]"
+          className="inline-flex items-center gap-2 text-sm font-medium text-[color:var(--accent-readable)] underline underline-offset-4 decoration-[color:var(--accent)]/40 hover:decoration-[color:var(--accent)]"
         >
           All articles
           <span aria-hidden>→</span>

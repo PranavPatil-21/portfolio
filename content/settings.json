@@ -28,7 +28,7 @@
     }
   ],
   "theme": {
-    "accent": "#7c5cff",
+    "accent": "#6d4aff",
     "background": "#08080c",
     "foreground": "#f4f4f7",
     "defaultMode": "dark"

@@ -30,7 +30,6 @@ export default async function Image() {
           padding: '80px',
           background,
           color: foreground,
-          fontFamily: 'sans-serif',
         }}
       >
         <div

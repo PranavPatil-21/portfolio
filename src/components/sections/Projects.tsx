@@ -52,7 +52,7 @@ export function Projects({ items }: { items: Project[] }) {
                   </div>
                 ) : null}
 
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-[color:var(--accent)]">
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-[color:var(--accent-readable)]">
                   {formatDate(item.date)}
                 </p>
                 <h3 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--foreground)]">
@@ -77,7 +77,7 @@ export function Projects({ items }: { items: Project[] }) {
                         href={item.repo}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="rounded text-[color:var(--accent)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                        className="rounded text-[color:var(--accent-readable)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                       >
                         Source code
                         <span className="sr-only"> — {item.title}</span>

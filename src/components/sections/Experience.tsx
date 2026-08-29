@@ -72,7 +72,7 @@ export function TimelineItem({
         className="absolute left-0 top-2 h-3 w-3 -translate-x-1/2 rounded-full border border-[color:var(--accent)] bg-[color:var(--background)]"
       />
       <Reveal delay={delay}>
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-[color:var(--accent)]">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-[color:var(--accent-readable)]">
           {period}
         </p>
         <h3 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--foreground)] sm:text-xl">
