@@ -4,6 +4,16 @@ import { getNativeArticles, getSettings } from '@/content'
 import { getAllArticles } from '@/lib/articles'
 import { ArticleCard } from '@/components/sections/Articles'
 
+/*
+ * Revalidate hourly.
+ *
+ * This page merges posts imported from Medium, which change without any commit
+ * to this repository — so a purely static render would freeze the list at
+ * whatever existed on the last deploy. An hour is a reasonable trade: fresh
+ * enough that publishing feels connected, cheap enough to be free.
+ */
+export const revalidate = 3600
+
 export function generateMetadata(): Metadata {
   const settings = getSettings()
   return {

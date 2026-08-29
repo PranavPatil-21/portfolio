@@ -19,11 +19,13 @@ import CommandPalette, { type CommandItem } from '@/components/CommandPalette'
 import SectionRenderer from '@/components/SectionRenderer'
 
 /**
- * Revalidate daily. This exists only for the Medium importer — native content
- * is baked at build time by the publish-triggers-rebuild flow, so nothing else
- * here needs a timer.
+ * Revalidate hourly, matching the article routes.
+ *
+ * This exists for the Medium importer: those posts change without any commit,
+ * so a static render would freeze the list at the last deploy. Native content
+ * needs no timer — publishing it triggers a rebuild.
  */
-export const revalidate = 86400
+export const revalidate = 3600
 
 export default async function Home() {
   const settings = getSettings()

@@ -61,6 +61,13 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
        * the wrong theme, and neither is acceptable.
        */
       suppressHydrationWarning
+      /*
+       * `globals.css` sets `scroll-behavior: smooth` for in-page anchors. Next
+       * needs to know that so it can suspend it during route transitions —
+       * without this attribute the framework cannot tell an intentional smooth
+       * scroll from one it is fighting, and the transition is skipped.
+       */
+      data-scroll-behavior="smooth"
       // The CMS-chosen palette is injected as CSS custom properties here, at the
       // root, so every derived design token downstream resolves against it.
       style={themeToCssVars(settings.theme) as React.CSSProperties}

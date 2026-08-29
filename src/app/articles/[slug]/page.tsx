@@ -8,6 +8,16 @@ import { MarkdownBody } from '@/lib/markdown'
 import { formatArticleDate } from '@/components/sections/Articles'
 import Tag from '@/components/ui/Tag'
 
+/*
+ * Revalidate hourly.
+ *
+ * This page merges posts imported from Medium, which change without any commit
+ * to this repository — so a purely static render would freeze the list at
+ * whatever existed on the last deploy. An hour is a reasonable trade: fresh
+ * enough that publishing feels connected, cheap enough to be free.
+ */
+export const revalidate = 3600
+
 type Params = { slug: string }
 
 async function findArticle(slug: string): Promise<Article | undefined> {
