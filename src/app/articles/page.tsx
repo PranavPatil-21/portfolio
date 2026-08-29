@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import TopBar from '@/components/TopBar'
 import Link from 'next/link'
 import { getNativeArticles, getSettings } from '@/content'
+import { getAllArticles } from '@/lib/articles'
 import { ArticleCard } from '@/components/sections/Articles'
 
 export function generateMetadata(): Metadata {
@@ -13,8 +14,8 @@ export function generateMetadata(): Metadata {
   }
 }
 
-export default function ArticlesPage() {
-  const articles = getNativeArticles()
+export default async function ArticlesPage() {
+  const articles = await getAllArticles()
 
   return (
     <>

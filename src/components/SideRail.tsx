@@ -55,8 +55,7 @@ export default function SideRail({
   layout: LayoutEntry[]
   emptyIds?: ReadonlySet<string>
 }) {
-  const { name, headline, bio, roles, location, email, resumePdf, socials, avatar, avatarAlt } =
-    settings
+  const { name, headline, bio, roles, email, resumePdf, socials, avatar, avatarAlt } = settings
   const resumeHref = resumePdf?.trim() ? resumePdf : null
 
   const items = layout
@@ -95,13 +94,16 @@ export default function SideRail({
   return (
     <header className="min-w-0 lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:flex-col lg:justify-between lg:pt-10 lg:pr-12 lg:pb-16 lg:pl-10 xl:pl-16">
       <div>
-        {location || roles[0] ? (
+        {roles[0] ? (
           <p className="eyebrow mb-5 flex items-center gap-2.5">
             <span
               aria-hidden="true"
               className="inline-block size-1.5 shrink-0 rounded-full bg-[var(--accent)]"
             />
-            {[location, roles[0]].filter((p) => p?.trim()).join('  ·  ')}
+            {/* Location deliberately excluded: it belongs in Contact, and in a
+                one-line eyebrow it competes with the thing that actually
+                positions him. */}
+            {roles[0]}
           </p>
         ) : null}
 

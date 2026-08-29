@@ -10,7 +10,7 @@ import {
   getMetrics,
   getLayout,
 } from '@/content'
-import { fetchMediumArticles } from '@/lib/medium'
+import { getAllArticles } from '@/lib/articles'
 import Footer from '@/components/Footer'
 import SideRail from '@/components/SideRail'
 import Spotlight from '@/components/Spotlight'
@@ -31,18 +31,7 @@ export default async function Home() {
   const layout = getLayout()
   const customSections = getCustomSections()
 
-  const native = getNativeArticles()
-  const imported =
-    settings.features.mediumImport && settings.features.mediumHandle
-      ? await fetchMediumArticles(settings.features.mediumHandle)
-      : []
-
-  // Native articles win on a slug collision — they are the copy the owner
-  // controls, and the one that renders in full.
-  const seen = new Set(native.map((a) => a.slug))
-  const articles = [...native, ...imported.filter((a) => !seen.has(a.slug))].sort((a, b) =>
-    b.date.localeCompare(a.date),
-  )
+  const articles = await getAllArticles()
 
   const customTitles = new Map(customSections.map((s) => [`custom:${s.slug}`, s.title]))
 

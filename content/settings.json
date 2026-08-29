@@ -1,9 +1,9 @@
 {
   "name": "Pranav Patil",
-  "headline": "I build the lending and credit systems behind *Wio Bank*'s Retail and SME products \u2014 and the *multi-agent AI* that investigates them when they break.",
+  "headline": "I build the credit systems behind *Wio Bank*'s lending \u2014 and the *multi-agent AI* that investigates them when they break.",
   "bio": "What holds my attention is the *decision* behind a system \u2014 who it is for, what breaks without it, and which constraint you refuse to trade away. I'm an engineer moving toward product roles where *AI is the product, not the garnish*.",
   "roles": [
-    "Software Engineer, moving toward Product",
+    "Engineer, moving into product",
     "Multi-Agent AI Systems",
     "Fintech \u2014 Lending, Credit & Payments"
   ],
@@ -47,7 +47,7 @@
   },
   "features": {
     "hero3d": true,
-    "mediumImport": false,
-    "mediumHandle": ""
+    "mediumImport": true,
+    "mediumHandle": "pranavnarendrapatil.2104"
   }
 }
