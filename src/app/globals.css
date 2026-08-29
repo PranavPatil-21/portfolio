@@ -9,60 +9,48 @@
  * from those three with `color-mix`, so a palette change in the CMS moves the
  * whole surface treatment with it and never leaves a hardcoded grey behind.
  *
- * The defaults are the dark palette: the site is dark-first, and these are what
- * renders in the brief moment before (or if ever without) CMS values.
+ * Switching the site to a light theme is those same three values — nothing here
+ * assumes a dark background beyond the default numbers.
  */
 :root {
-  --accent: #6c5ce7;
-  /* Fallbacks. `themeToCssVars` overrides both on <html> with values computed
-     from the CMS palette, guaranteeing WCAG AA whatever colour is chosen:
-     --accent-contrast is text ON the accent, --accent-readable is accent AS text. */
+  --accent: #5b8def;
+  /* Computed by `themeToCssVars` from the CMS palette so both clear WCAG AA
+     whatever colour is chosen: --accent-contrast is text ON the accent,
+     --accent-readable is the accent used AS text. */
   --accent-contrast: #ffffff;
   --accent-readable: var(--accent);
-  --background: #0b0b12;
-  --foreground: #f5f5f7;
+  --background: #0b0c0e;
+  --foreground: #f2f4f7;
 
-  /* Derived — do not set these from the CMS. */
-  --muted: color-mix(in oklab, var(--foreground) 62%, var(--background));
-  --hairline: color-mix(in oklab, var(--foreground) 14%, transparent);
-  --surface: color-mix(in oklab, var(--foreground) 4%, transparent);
-  --surface-strong: color-mix(in oklab, var(--foreground) 8%, transparent);
-  --accent-soft: color-mix(in oklab, var(--accent) 18%, transparent);
+  /* Derived — never set these from the CMS. */
+  --muted: color-mix(in oklab, var(--foreground) 76%, var(--background));
+  --subtle: color-mix(in oklab, var(--foreground) 62%, var(--background));
+  --hairline: color-mix(in oklab, var(--foreground) 12%, transparent);
+  --surface: color-mix(in oklab, var(--foreground) 3.5%, transparent);
+  --surface-strong: color-mix(in oklab, var(--foreground) 7%, transparent);
+  --accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
 }
 
 @theme inline {
-  /* CMS-driven — these are the reason the whole file exists. */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
   --color-accent-readable: var(--accent-readable);
   --color-accent-contrast: var(--accent-contrast);
 
-  /* Derived surface scale. */
   --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
   --color-hairline: var(--hairline);
   --color-surface: var(--surface);
   --color-surface-strong: var(--surface-strong);
   --color-accent-soft: var(--accent-soft);
 
   --font-sans: var(--font-inter);
-  --font-serif: var(--font-playfair);
   --font-mono: var(--font-geist-mono);
-
-  --shadow-glass: 0 1px 0 0 color-mix(in oklab, var(--foreground) 8%, transparent) inset,
-    0 18px 40px -24px rgb(0 0 0 / 0.55);
-  --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--accent) 28%, transparent),
-    0 24px 60px -28px color-mix(in oklab, var(--accent) 55%, transparent);
 
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/*
- * Ambient gradient wash. Two soft accent pools plus a fine grid, fixed to the
- * viewport so content scrolls over a stable field rather than dragging the
- * gradient with it. Purely decorative — `body::before` keeps it out of the
- * accessibility tree entirely.
- */
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -72,65 +60,42 @@ body {
 }
 
 /*
- * Film grain. A fixed noise layer at very low opacity stops large flat dark
- * areas from banding on cheap panels and is most of why the design reads as
- * "cinematic" rather than "a dark website". `contain: strict` keeps it from
- * participating in layout or paint invalidation as the page scrolls.
+ * Type scale.
+ *
+ * Deliberately restrained. The previous version set headings at 13vw, which
+ * looks impressive in a screenshot and pushes the actual evidence — what was
+ * shipped and what changed — below the fold. A reader skimming for thirty
+ * seconds should reach the substance without scrolling past a poster.
  */
-.grain-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 60;
-  opacity: 0.045;
-  contain: strict;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+.display {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 600;
 }
 
-/*
- * Outlined italic serif. Used for the quieter half of a heading pair, so the
- * line reads as two voices rather than one long shout. `-webkit-text-stroke`
- * has no standard equivalent with this support profile; the fallback where it
- * is unsupported is simply solid text, which is still legible.
- */
-.ghost {
-  font-family: var(--font-playfair), "Playfair Display", ui-serif, serif;
-  font-style: italic;
-  font-weight: 400;
-  color: transparent;
-  -webkit-text-stroke: 1.4px color-mix(in oklab, var(--foreground) 48%, transparent);
-  letter-spacing: -0.01em;
+.heading {
+  font-size: clamp(1.5rem, 2.6vw, 2.125rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 600;
 }
 
-.ghost-accent {
-  font-family: var(--font-playfair), "Playfair Display", ui-serif, serif;
-  font-style: italic;
-  font-weight: 400;
-  color: transparent;
-  -webkit-text-stroke: 1.2px var(--accent);
-  letter-spacing: -0.01em;
+.eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--subtle);
 }
 
-/* Masks the hard bottom edge of the viewport so sections drift out of frame. */
-.bottom-blur {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 130px;
-  pointer-events: none;
-  z-index: 40;
-  background: linear-gradient(to top, var(--background), transparent);
-}
-
-/* Tabular figures keep animated metric counters from jittering as digits change. */
+/* Tabular figures stop animated counters from jittering as digits change. */
 .tabular {
   font-variant-numeric: tabular-nums;
 }
 
-/* Selection and focus pick up the accent so the theme reads as intentional. */
 ::selection {
-  background: color-mix(in oklab, var(--accent) 35%, transparent);
+  background: color-mix(in oklab, var(--accent) 30%, transparent);
   color: var(--foreground);
 }
 
@@ -140,7 +105,6 @@ body {
   border-radius: 4px;
 }
 
-/* Anchor navigation lands below the sticky nav rather than under it. */
 html {
   scroll-behavior: smooth;
 }
@@ -175,9 +139,5 @@ html {
   [data-testid='reveal'] {
     opacity: 1 !important;
     transform: none !important;
-  }
-
-  body::before {
-    display: none;
   }
 }

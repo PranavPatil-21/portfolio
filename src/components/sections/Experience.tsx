@@ -41,12 +41,11 @@ export function formatRange(start: string, end?: string, current = false): strin
 }
 
 /**
- * The vertical rail that Education and Responsibilities hang off.
+ * The vertical rail primitive.
  *
- * Kept here — and kept exactly as it was — because those two sections import it
- * from this module. Experience itself has outgrown the shared rail and renders
- * its own treatment below; this pair stays as the quieter primitive for the
- * supporting sections, which should not compete with it.
+ * Kept here — and kept exactly as it was — because other section files import
+ * it from this module. Experience itself no longer uses it: the section below
+ * renders a denser two-column row instead.
  */
 export function Timeline({ children }: { children: ReactNode }) {
   return <ol className="relative ml-1 space-y-0 border-l border-hairline">{children}</ol>
@@ -119,7 +118,7 @@ export type EmphasisSegment = { text: string; emphasis: boolean }
  *
  * Segment-based rather than word-based on purpose: an outcome-led bullet
  * emphasises a *phrase* ("cut settlement latency 40%"), and splitting on spaces
- * first would break the phrase into separately-animated words and lose the run.
+ * first would break the phrase into separate runs and lose it.
  */
 export function parseEmphasis(text: string): EmphasisSegment[] {
   return text
@@ -138,10 +137,7 @@ function Emphasised({ text }: { text: string }) {
     <>
       {parseEmphasis(text).map((segment, i) =>
         segment.emphasis ? (
-          <span
-            key={i}
-            className="font-medium text-[var(--accent-readable)]"
-          >
+          <span key={i} className="font-medium text-[var(--accent-readable)]">
             {segment.text}
           </span>
         ) : (
@@ -153,16 +149,16 @@ function Emphasised({ text }: { text: string }) {
 }
 
 /**
- * Professional history as a cinematic timeline.
+ * Professional history, compact.
  *
- * The hierarchy is the argument: the **company** is the largest element, the
- * date range is a quiet mono label beside it, the bullets carry the outcome,
- * and the stack is the smallest thing on the row. Reading top to bottom you get
- * *where*, *what changed*, and only then *how it was built* — which is the order
- * a reader assessing judgement cares about, and the reverse of a stack list.
+ * The current role is argued in full elsewhere on the page, so this section is
+ * the supporting record: a two-column row per role — dates parked in a narrow
+ * left rail, everything that varies in a single readable column — so a reader
+ * can run their eye down the timeline and down the outcomes independently
+ * without either competing for the same horizontal space.
  *
  * Returns `null` for an empty list so an emptied collection omits the section
- * rather than shipping a bare heading (design spec §8, "Error handling").
+ * rather than shipping a bare heading.
  */
 export function Experience({ items }: { items: ExperienceItem[] }) {
   if (items.length === 0) return null
@@ -170,65 +166,55 @@ export function Experience({ items }: { items: ExperienceItem[] }) {
   return (
     <SectionShell
       id="experience"
-      eyebrow="Professional"
+      eyebrow="Track record"
       title="Experience"
-      index="02 / EXPERIENCE"
-      subtitle="Roles, and what measurably changed while I held them."
+      subtitle="Roles held, and what measurably changed while I held them."
     >
       <ol className="flex flex-col">
         {items.map((item, i) => (
           <li
             key={item.slug || `${item.company}-${item.start}`}
-            className="group relative border-t border-[var(--hairline)] py-10 transition-colors duration-500 first:border-t-0 hover:border-[color-mix(in_oklab,var(--accent)_45%,transparent)] motion-reduce:transition-none md:py-14"
+            className="border-t border-[var(--hairline)] py-8 first:border-t-0 first:pt-0"
           >
-            {/* The accent rail wipes down on hover — pure transform, so it never
-                touches layout, and it is stripped under reduced motion. */}
-            <span
-              aria-hidden="true"
-              className="absolute top-0 bottom-0 left-0 w-px origin-top scale-y-0 bg-[var(--accent)] transition-transform duration-500 ease-out group-hover:scale-y-100 motion-reduce:transition-none motion-reduce:group-hover:scale-y-0"
-            />
-
-            <Reveal delay={i * 0.06}>
-              <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-baseline">
-                <div>
-                  <p className="font-mono text-[10px] tracking-[0.35em] text-[var(--foreground)]/55 uppercase">
-                    <span>{item.role}</span>
-                    {item.location ? (
-                      <span className="text-[var(--foreground)]/55"> · {item.location}</span>
-                    ) : null}
-                  </p>
-                  <h3 className="mt-3 text-3xl leading-[0.95] font-black tracking-tighter text-[var(--foreground)] transition-transform duration-500 ease-out group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 sm:text-4xl md:text-5xl">
-                    {item.company}
-                  </h3>
-                </div>
-
-                <p className="tabular font-mono text-[11px] tracking-[0.2em] text-[var(--accent-readable)] uppercase md:text-right">
+            <Reveal delay={i * 0.05}>
+              <div className="grid gap-x-8 gap-y-3 md:grid-cols-[9rem_minmax(0,1fr)]">
+                <p className="tabular pt-0.5 font-mono text-[11px] leading-relaxed tracking-[0.08em] text-[var(--subtle)] uppercase">
                   {formatRange(item.start, item.end, item.current)}
                 </p>
+
+                <div>
+                  <h3 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">
+                    {item.company}
+                  </h3>
+                  <p className="mt-0.5 text-sm text-[var(--muted)]">
+                    <span className="font-medium text-[var(--foreground)]">{item.role}</span>
+                    {item.location ? <span> · {item.location}</span> : null}
+                  </p>
+
+                  {item.bullets.length > 0 ? (
+                    <ul className="mt-4 space-y-2.5">
+                      {item.bullets.map((bullet) => (
+                        <li
+                          key={bullet}
+                          className="relative pl-5 text-[14.5px] leading-relaxed text-[var(--muted)] before:absolute before:top-[0.7em] before:left-0 before:h-px before:w-2.5 before:bg-[var(--accent)]"
+                        >
+                          <Emphasised text={bullet} />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+
+                  {item.tech.length > 0 ? (
+                    <ul className="mt-4 flex flex-wrap gap-1.5">
+                      {item.tech.map((tech) => (
+                        <li key={tech}>
+                          <Tag>{tech}</Tag>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
               </div>
-
-              {item.bullets.length > 0 ? (
-                <ul className="mt-7 max-w-3xl space-y-3">
-                  {item.bullets.map((bullet) => (
-                    <li
-                      key={bullet}
-                      className="relative pl-6 text-sm leading-relaxed text-[var(--foreground)]/60 before:absolute before:top-[0.65em] before:left-0 before:h-px before:w-3 before:bg-[var(--accent)]"
-                    >
-                      <Emphasised text={bullet} />
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-
-              {item.tech.length > 0 ? (
-                <ul className="mt-7 flex flex-wrap gap-2">
-                  {item.tech.map((tech) => (
-                    <li key={tech}>
-                      <Tag>{tech}</Tag>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
             </Reveal>
           </li>
         ))}

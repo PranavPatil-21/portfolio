@@ -84,6 +84,13 @@ export const socialSchema = z.object({
 export const settingsSchema = z.object({
   name: z.string().min(1),
   roles: stringList().pipe(z.array(z.string().min(1)).min(1, 'add at least one role')),
+  /**
+   * The positioning sentence — the largest, most important text on the site.
+   * Separate from `bio` so the owner can edit the claim itself from `/admin`
+   * rather than it living as a constant in a component. Supports *asterisk*
+   * emphasis, which renders in the accent colour.
+   */
+  headline: optionalish(z.string()),
   bio: z.string().min(1),
   location: z.string().default(''),
   email: z.string().email(),

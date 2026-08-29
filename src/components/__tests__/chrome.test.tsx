@@ -3,8 +3,6 @@ import { render, screen, fireEvent, cleanup, within } from '@testing-library/rea
 import type { LayoutEntry, Settings } from '@/content'
 import Nav from '../Nav'
 import Footer from '../Footer'
-import Grain from '../Grain'
-import Cursor from '../Cursor'
 
 /**
  * jsdom ships no `matchMedia`. Every component under test asks it a different
@@ -70,8 +68,14 @@ const layout: LayoutEntry[] = [
 
 const customTitles = new Map<string, string>([['photography', 'Photography']])
 
-function renderNav() {
-  return render(<Nav layout={layout} settings={settings} customTitles={customTitles} />)
+function renderNav(overrides: Partial<Settings> = {}) {
+  return render(
+    <Nav
+      layout={layout}
+      settings={{ ...settings, ...overrides } as Settings}
+      customTitles={customTitles}
+    />,
+  )
 }
 
 beforeEach(() => {
@@ -152,64 +156,73 @@ describe('Nav', () => {
   })
 })
 
-describe('Cursor', () => {
-  it('renders a dot and a ring on a fine-pointer device with motion allowed', () => {
-    stubMatchMedia({ reduced: false, pointer: 'fine' })
-    const { container } = render(<Cursor />)
+/**
+ * The bar carries the one thing a recruiter is looking for. These pin that it
+ * is always present, that it prefers the résumé over the mailto, and that its
+ * accessible name never collides with the wordmark — `getByRole` throws on a
+ * duplicate match, so a CTA named after the owner would silently take the
+ * "links the owner name back to the top" assertion above down with it.
+ */
+describe('Nav call to action', () => {
+  it('renders a résumé download when resumePdf is set', () => {
+    renderNav({ resumePdf: '/uploads/resume.pdf' })
+    const primary = screen.getByRole('navigation', { name: /primary/i })
 
-    expect(container.querySelector('[data-testid="cursor-dot"]')).toBeInTheDocument()
-    expect(container.querySelector('[data-testid="cursor-ring"]')).toBeInTheDocument()
+    const cta = within(primary).getByRole('link', { name: /resume/i })
+    expect(cta).toHaveAttribute('href', '/uploads/resume.pdf')
+    expect(cta).toHaveAttribute('download')
   })
 
-  it('renders nothing on a coarse-pointer (touch) device and never hides the native cursor', () => {
-    stubMatchMedia({ reduced: false, pointer: 'coarse' })
-    const { container } = render(<Cursor />)
+  it('falls back to a mailto CTA when there is no résumé', () => {
+    renderNav()
+    const primary = screen.getByRole('navigation', { name: /primary/i })
 
-    expect(container).toBeEmptyDOMElement()
-    expect(document.documentElement.className).not.toContain('cursor-none')
+    expect(within(primary).getByRole('link', { name: /email me/i })).toHaveAttribute(
+      'href',
+      'mailto:hello@example.com',
+    )
+    expect(within(primary).queryByRole('link', { name: /resume/i })).not.toBeInTheDocument()
   })
 
-  it('renders nothing when reduced motion is preferred', () => {
-    stubMatchMedia({ reduced: true, pointer: 'fine' })
-    const { container } = render(<Cursor />)
-
-    expect(container).toBeEmptyDOMElement()
-    expect(document.documentElement.className).not.toContain('cursor-none')
+  it('does not name the CTA after the owner, so the wordmark stays unambiguous', () => {
+    renderNav({ resumePdf: '/uploads/resume.pdf' })
+    // Throws if the CTA also matched — which is the failure this guards.
+    expect(screen.getByRole('link', { name: /pranav patil/i })).toHaveAttribute('href', '#hero')
   })
 
-  it('never leaves the native cursor hidden after unmount', () => {
-    stubMatchMedia({ reduced: false, pointer: 'fine' })
-    const { unmount } = render(<Cursor />)
+  it('repeats the CTA inside the mobile menu and closes the menu on click', () => {
+    renderNav({ resumePdf: '/uploads/resume.pdf' })
+    fireEvent.click(screen.getByRole('button', { name: /menu/i }))
 
-    expect(document.documentElement.className).toContain('cursor-none')
-    expect(document.head.innerHTML).toContain('cursor: none')
+    const overlay = screen.getByRole('navigation', { name: /mobile/i })
+    const cta = within(overlay).getByRole('link', { name: /resume/i })
+    expect(cta).toHaveAttribute('href', '/uploads/resume.pdf')
 
-    unmount()
-
-    // Both halves must go. The class alone is inert, but a `cursor: none` rule
-    // left behind in <head> would hide the pointer on a page that no longer
-    // draws a replacement — the exact failure this component must not cause.
-    expect(document.documentElement.className).not.toContain('cursor-none')
-    expect(document.head.innerHTML).not.toContain('cursor: none')
-  })
-
-  it('does not inject the cursor-hiding rule at all on a touch device', () => {
-    stubMatchMedia({ reduced: false, pointer: 'coarse' })
-    render(<Cursor />)
-
-    expect(document.head.innerHTML).not.toContain('cursor: none')
+    fireEvent.click(cta)
+    expect(screen.queryByRole('navigation', { name: /mobile/i })).not.toBeInTheDocument()
   })
 })
 
-describe('Grain', () => {
-  it('renders a decorative overlay hidden from assistive technology', () => {
-    const { container } = render(<Grain />)
-    const overlay = container.querySelector('.grain-overlay')
+describe('Nav scroll state', () => {
+  it('starts transparent and becomes opaque once the page has scrolled', () => {
+    const { container } = renderNav()
+    const header = container.querySelector('header')
 
-    expect(overlay).toBeInTheDocument()
-    expect(overlay).toHaveAttribute('aria-hidden', 'true')
+    expect(header).toHaveAttribute('data-scrolled', 'false')
+
+    Object.defineProperty(window, 'scrollY', { value: 400, configurable: true })
+    fireEvent.scroll(window)
+
+    expect(header).toHaveAttribute('data-scrolled', 'true')
+    expect(header?.className).toContain('bg-[var(--background)]')
+
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true })
+    fireEvent.scroll(window)
+    expect(header).toHaveAttribute('data-scrolled', 'false')
   })
 })
+
+
 
 describe('Footer', () => {
   it('renders the email as a mailto link, the socials, and a copyright line', () => {
@@ -230,5 +243,17 @@ describe('Footer', () => {
     expect(
       screen.getByText(new RegExp(`${new Date().getFullYear()}`)),
     ).toBeInTheDocument()
+  })
+
+  it('signs off with the owner name and does not repeat it as a link', () => {
+    render(<Footer settings={settings} />)
+    expect(screen.getAllByText(/pranav patil/i).length).toBeGreaterThan(0)
+    expect(screen.queryByRole('link', { name: /^pranav patil$/i })).not.toBeInTheDocument()
+  })
+
+  it('renders no social list when socials is empty, keeping the email', () => {
+    render(<Footer settings={{ ...settings, socials: [] } as Settings} />)
+    expect(screen.queryByRole('link', { name: 'GitHub' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /hello@example\.com/i })).toBeInTheDocument()
   })
 })

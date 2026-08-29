@@ -51,8 +51,9 @@ export function formatRange(start: string, end?: string): string {
  * The rail Education and Responsibilities share.
  *
  * These are supporting evidence, not headline material, so the treatment is
- * deliberately quieter than Experience or Projects: hairline rules, a mono date
- * in its own column, and no card surfaces competing for attention.
+ * deliberately quiet: hairline rules, a mono date in its own column, and no
+ * card surfaces competing with Experience or Projects for attention. A reader
+ * skimming for thirty seconds should be able to take this in without stopping.
  */
 export function CredentialList({ children }: { children: ReactNode }) {
   return (
@@ -81,27 +82,25 @@ export function CredentialRow({
   return (
     <li>
       <Reveal delay={delay}>
-        <div className="group grid gap-3 py-9 md:grid-cols-[minmax(0,11rem)_1fr] md:gap-12">
-          <p className="font-mono text-[10px] tracking-[0.35em] text-[var(--foreground)]/55 uppercase md:pt-2">
-            {period}
-          </p>
+        <div className="grid gap-2 py-6 md:grid-cols-[10rem_1fr] md:gap-8">
+          <p className="eyebrow tabular md:pt-1">{period}</p>
 
           <div className="min-w-0">
-            <h3 className="text-xl font-semibold tracking-tight text-[var(--foreground)] transition-colors duration-500 group-hover:text-[var(--accent-readable)] motion-reduce:transition-none sm:text-2xl">
+            <h3 className="text-base font-semibold tracking-tight text-[var(--foreground)]">
               {heading}
             </h3>
 
-            <p className="mt-2 text-sm text-[var(--foreground)]/60">
+            <p className="mt-1 text-sm text-[var(--muted)]">
               <span>{subheading}</span>
-              {meta ? <span className="text-[var(--foreground)]/55"> · {meta}</span> : null}
+              {meta ? <span className="text-[var(--subtle)]"> · {meta}</span> : null}
             </p>
 
             {bullets.length > 0 ? (
-              <ul className="mt-5 list-none space-y-2.5 p-0">
+              <ul className="mt-3 list-none space-y-1.5 p-0">
                 {bullets.map((bullet) => (
                   <li
                     key={bullet}
-                    className="relative pl-6 text-sm leading-relaxed text-[var(--foreground)]/60 before:absolute before:top-[0.85em] before:left-0 before:h-px before:w-3 before:bg-[var(--accent)]/70"
+                    className="relative pl-4 text-sm leading-relaxed text-[var(--muted)] before:absolute before:top-[0.7em] before:left-0 before:h-px before:w-2 before:bg-[var(--accent)]"
                   >
                     {bullet}
                   </li>
@@ -125,8 +124,7 @@ export function Education({ items }: { items: EducationItem[] }) {
   return (
     <SectionShell
       id="education"
-      index="06 / EDUCATION"
-      eyebrow="Foundations"
+      eyebrow="Background"
       title="Education"
       subtitle="The grounding underneath the work."
     >
@@ -139,7 +137,7 @@ export function Education({ items }: { items: EducationItem[] }) {
             subheading={item.degree}
             meta={item.location || undefined}
             bullets={item.details}
-            delay={i * 0.06}
+            delay={i * 0.05}
           />
         ))}
       </CredentialList>

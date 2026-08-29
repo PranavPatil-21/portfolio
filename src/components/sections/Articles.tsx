@@ -5,8 +5,6 @@ import Card from '@/components/ui/Card'
 import Tag from '@/components/ui/Tag'
 import Reveal from '@/components/ui/Reveal'
 
-const META = 'font-mono text-[10px] tracking-[0.35em] uppercase text-[var(--foreground)]/55'
-
 /**
  * Where an article actually lives.
  *
@@ -44,7 +42,7 @@ export function formatArticleDate(date: string): string {
 function ArticleLink({ article }: { article: Article }) {
   const { external, href } = resolveDestination(article)
   const className =
-    'after:absolute after:inset-0 transition-colors duration-500 hover:text-[var(--accent-readable)] motion-reduce:transition-none'
+    'after:absolute after:inset-0 transition-colors duration-200 hover:text-[var(--accent-readable)] motion-reduce:transition-none'
 
   return external ? (
     <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
@@ -60,21 +58,19 @@ function ArticleLink({ article }: { article: Article }) {
 /**
  * The externally-hosted marker.
  *
- * Deliberately louder than the date: whether a click leaves the site is the one
+ * Kept as prominent as the date: whether a click leaves the site is the one
  * thing a reader wants to know before they click.
  */
 function ExternalBadge() {
   return (
-    <span className="font-mono text-[10px] tracking-[0.28em] text-[var(--accent-readable)] uppercase">
-      Hosted on Medium
-    </span>
+    <span className="eyebrow text-[var(--accent-readable)]">Hosted on Medium</span>
   )
 }
 
 function ArticleTags({ tags }: { tags: string[] }) {
   if (tags.length === 0) return null
   return (
-    <ul className="mt-5 flex list-none flex-wrap gap-2 p-0">
+    <ul className="mt-3 flex list-none flex-wrap gap-1.5 p-0">
       {tags.map((tag) => (
         <li key={tag}>
           <Tag>{tag}</Tag>
@@ -92,20 +88,20 @@ export function ArticleCard({ article }: { article: Article }) {
   const { external } = resolveDestination(article)
 
   return (
-    <Card className="group relative flex h-full flex-col p-6 transition-transform duration-500 hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        <time dateTime={article.date} className={META}>
+    <Card className="group relative flex h-full flex-col p-5">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <time dateTime={article.date} className="eyebrow tabular">
           {formatArticleDate(article.date)}
         </time>
         {external ? <ExternalBadge /> : null}
       </div>
 
-      <h3 className="mt-5 text-xl leading-tight font-semibold tracking-tight text-balance text-[var(--foreground)]">
+      <h3 className="mt-3 text-[17px] leading-snug font-semibold tracking-tight text-balance text-[var(--foreground)]">
         <ArticleLink article={article} />
       </h3>
 
       {article.excerpt ? (
-        <p className="mt-4 text-sm leading-relaxed text-pretty text-[var(--foreground)]/60">
+        <p className="mt-2 text-sm leading-relaxed text-pretty text-[var(--muted)]">
           {article.excerpt}
         </p>
       ) : null}
@@ -114,10 +110,7 @@ export function ArticleCard({ article }: { article: Article }) {
         <ArticleTags tags={article.tags} />
       </div>
 
-      <span
-        aria-hidden="true"
-        className="mt-6 font-mono text-[10px] tracking-[0.28em] text-[var(--accent-readable)] uppercase transition-transform duration-500 group-hover:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none"
-      >
+      <span aria-hidden="true" className="mt-4 text-[13px] text-[var(--accent-readable)]">
         {external ? 'Read on Medium →' : 'Read article →'}
       </span>
     </Card>
@@ -125,28 +118,29 @@ export function ArticleCard({ article }: { article: Article }) {
 }
 
 /**
- * The editorial row: a mono date column beside a large title, excerpt and tags.
- * Rules rather than surfaces, so the list reads as a contents page.
+ * The editorial row: a mono date column beside the title, excerpt and tags.
+ * Rules rather than surfaces, so the list reads as a contents page — the
+ * fastest thing to scan when a reader is deciding whether to stop.
  */
 function ArticleRow({ article }: { article: Article }) {
   const { external } = resolveDestination(article)
 
   return (
-    <article className="group relative grid gap-4 py-10 md:grid-cols-[minmax(0,11rem)_1fr] md:gap-12">
-      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2 md:flex-col md:items-start md:pt-3">
-        <time dateTime={article.date} className={META}>
+    <article className="group relative grid gap-2 py-6 md:grid-cols-[10rem_1fr] md:gap-8">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 md:flex-col md:items-start md:gap-y-2 md:pt-1">
+        <time dateTime={article.date} className="eyebrow tabular">
           {formatArticleDate(article.date)}
         </time>
         {external ? <ExternalBadge /> : null}
       </div>
 
       <div className="min-w-0">
-        <h3 className="text-2xl leading-[1.05] font-semibold tracking-tighter text-balance text-[var(--foreground)] sm:text-3xl md:text-4xl">
+        <h3 className="text-lg leading-snug font-semibold tracking-tight text-balance text-[var(--foreground)]">
           <ArticleLink article={article} />
         </h3>
 
         {article.excerpt ? (
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-pretty text-[var(--foreground)]/60">
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-pretty text-[var(--muted)]">
             {article.excerpt}
           </p>
         ) : null}
@@ -155,7 +149,7 @@ function ArticleRow({ article }: { article: Article }) {
 
         <span
           aria-hidden="true"
-          className="mt-6 inline-block font-mono text-[10px] tracking-[0.28em] text-[var(--accent-readable)] uppercase opacity-0 transition-all duration-500 group-hover:translate-x-1 group-hover:opacity-100 motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none"
+          className="mt-3 inline-block text-[13px] text-[var(--accent-readable)] opacity-0 transition-opacity duration-200 group-hover:opacity-100 motion-reduce:opacity-100 motion-reduce:transition-none"
         >
           {external ? 'Read on Medium →' : 'Read article →'}
         </span>
@@ -183,35 +177,27 @@ export default function Articles({
   return (
     <SectionShell
       id="articles"
-      index="05 / WRITING"
       eyebrow="Selected"
       title="Writing"
       subtitle="Notes on what I build, why it was worth building, and what it cost."
+      action={
+        <Link
+          href="/articles"
+          className="text-[13px] text-[var(--accent-readable)] underline-offset-4 transition-colors duration-200 hover:underline motion-reduce:transition-none"
+        >
+          All articles →
+        </Link>
+      }
     >
       <ol className="list-none divide-y divide-[var(--hairline)] border-y border-[var(--hairline)] p-0">
         {shown.map((article, i) => (
           <li key={article.slug}>
-            <Reveal delay={i * 0.06}>
+            <Reveal delay={i * 0.05}>
               <ArticleRow article={article} />
             </Reveal>
           </li>
         ))}
       </ol>
-
-      <p className="mt-12">
-        <Link
-          href="/articles"
-          className="group inline-flex items-baseline gap-3 font-mono text-[11px] tracking-[0.28em] text-[var(--accent-readable)] uppercase transition-colors duration-300 motion-reduce:transition-none"
-        >
-          All articles
-          <span
-            aria-hidden="true"
-            className="transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none"
-          >
-            →
-          </span>
-        </Link>
-      </p>
     </SectionShell>
   )
 }

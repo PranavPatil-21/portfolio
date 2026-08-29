@@ -2,67 +2,27 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import type { Settings } from '@/content'
 
+import Hero, { parseEmphasis } from '../Hero'
+
 /**
- * The hero is the one section where "it looks right" and "it is readable"
- * genuinely diverge: GSAP drives the choreography, and a botched reveal leaves
- * the owner's name sitting at `opacity: 0` on a page that still scores fine on
- * every other check. These tests therefore assert two separate things — that
- * every string is present in the DOM, and that nothing is left invisible.
+ * The hero carries the thirty seconds a hiring manager actually spends here.
+ * Two things therefore have to hold unconditionally: every load-bearing string
+ * is in the *server-rendered* DOM, and none of it is sitting at `opacity: 0`
+ * waiting for an animation that may never run.
+ *
+ * There is no canvas and no GSAP any more, so there is nothing to mock beyond
+ * `matchMedia` — which jsdom does not implement, and which `Magnetic` probes.
  */
 
-// GSAP never runs for real here. jsdom has no layout, so a timeline would tween
-// against zeroed metrics and tell us nothing; what matters is *whether* it was
-// invoked, which a mock reports precisely.
-const gsapCalls = {
-  from: [] as unknown[][],
-  to: [] as unknown[][],
-  registerPlugin: [] as unknown[][],
-  revert: 0,
-}
-
-vi.mock('gsap', () => {
-  const context = (fn: () => void) => {
-    fn()
-    return {
-      revert: () => {
-        gsapCalls.revert += 1
-      },
-    }
-  }
-  const gsap = {
-    registerPlugin: (...args: unknown[]) => {
-      gsapCalls.registerPlugin.push(args)
-    },
-    context,
-    from: (...args: unknown[]) => {
-      gsapCalls.from.push(args)
-      return {}
-    },
-    to: (...args: unknown[]) => {
-      gsapCalls.to.push(args)
-      return {}
-    },
-    set: () => ({}),
-  }
-  return { default: gsap, gsap }
-})
-
-vi.mock('gsap/ScrollTrigger', () => ({
-  ScrollTrigger: { create: () => ({}), getAll: () => [], refresh: () => {} },
-  default: { create: () => ({}) },
-}))
-
-// The particle portrait pulls in `three`; it has its own test file.
-
-import Hero from '../Hero'
-
-const BIO_ONE = 'Builds backend systems for payments and lending at scale.'
-const BIO_TWO = 'Works mostly in Java, Kotlin and TypeScript.'
+const BIO_ONE =
+  "I'm a software engineer at Wio Bank, where I build the lending and payments systems behind Retail and SME credit products."
+const BIO_TWO = "I'm moving toward product roles where AI is the product, not the garnish."
 
 function makeSettings(overrides: Partial<Settings> = {}): Settings {
   return {
     name: 'Pranav Patil',
-    roles: ['Software Engineer', 'Backend & Distributed Systems'],
+    roles: ['Software Engineer, moving toward Product', 'AI & Multi-Agent Systems'],
+    headline: HEADLINE,
     bio: `${BIO_ONE}\n\n${BIO_TWO}`,
     location: 'Gurugram, India',
     email: 'hello@example.com',
@@ -72,13 +32,13 @@ function makeSettings(overrides: Partial<Settings> = {}): Settings {
       { label: 'LinkedIn', url: 'https://linkedin.com/in/x', icon: 'linkedin' },
     ],
     theme: {
-      accent: '#ff6b1a',
-      background: '#080808',
-      foreground: '#f4f4f7',
+      accent: '#5b8def',
+      background: '#0b0c0e',
+      foreground: '#f2f4f7',
       defaultMode: 'dark',
     },
     seo: { title: 't', description: 'd' },
-    features: { hero3d: true, mediumImport: false },
+    features: { hero3d: false, mediumImport: false },
     ...overrides,
   } as Settings
 }
@@ -100,7 +60,11 @@ function mockMatchMedia(reduced: boolean) {
   })
 }
 
-/** Whitespace-insensitive read of everything the page actually says. */
+/** Whitespace-insensitive read of everything the section actually says. */
+const HEADLINE =
+  'I build the *lending systems* behind Retail and SME credit at Wio Bank — moving toward *product roles where AI is the product*.'
+const HEADLINE_PLAIN = HEADLINE.replace(/\*/g, '')
+
 function readableText(container: HTMLElement): string {
   return (container.textContent ?? '').replace(/\s+/g, ' ').trim()
 }
@@ -108,9 +72,9 @@ function readableText(container: HTMLElement): string {
 /**
  * Every element that would render invisible, by class or by inline style.
  *
- * The inline half is the half that matters: GSAP writes `style="opacity:0"`,
- * never a class, so a class-only scan would pass vacuously against exactly the
- * bug this guards.
+ * The inline half is the half that matters: a motion library writes
+ * `style="opacity:0"`, never a class, so a class-only scan would pass
+ * vacuously against exactly the bug this guards.
  */
 function invisibleElements(container: HTMLElement): Element[] {
   return Array.from(container.querySelectorAll('*')).filter((el) => {
@@ -121,10 +85,6 @@ function invisibleElements(container: HTMLElement): Element[] {
 }
 
 beforeEach(() => {
-  gsapCalls.from.length = 0
-  gsapCalls.to.length = 0
-  gsapCalls.registerPlugin.length = 0
-  gsapCalls.revert = 0
   mockMatchMedia(false)
 })
 
@@ -133,16 +93,28 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('Hero — content is server-rendered DOM', () => {
+describe('Hero — the thirty-second read', () => {
   it('renders the name in the level-1 heading', () => {
     render(<Hero settings={makeSettings()} />)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Pranav Patil')
   })
 
-  it('renders every role as its own node', () => {
-    render(<Hero settings={makeSettings()} />)
-    expect(screen.getByText('Software Engineer')).toBeInTheDocument()
-    expect(screen.getByText('Backend & Distributed Systems')).toBeInTheDocument()
+  it('renders the positioning sentence as one contiguous line of text', () => {
+    const { container } = render(<Hero settings={makeSettings()} />)
+    expect(readableText(container)).toContain(HEADLINE_PLAIN)
+  })
+
+  it('states the current employer and the direction of travel', () => {
+    // Scoped to the positioning element specifically. Asserting against the
+    // whole section would pass vacuously — the bio mentions both phrases too,
+    // so a hero that rendered *only* the bio would look correct here.
+    const { container } = render(<Hero settings={makeSettings()} />)
+    const positioning = container.querySelector('[data-positioning]')
+    expect(positioning).not.toBeNull()
+    const text = readableText(positioning as HTMLElement)
+    expect(text).toContain('Wio Bank')
+    expect(text).toContain('product roles where AI is the product')
+    expect(text).not.toContain('*')
   })
 
   it('renders the full bio text', () => {
@@ -154,8 +126,17 @@ describe('Hero — content is server-rendered DOM', () => {
 
   it('splits a blank-line-separated bio into separate paragraphs', () => {
     const { container } = render(<Hero settings={makeSettings()} />)
-    const paragraphs = Array.from(container.querySelectorAll('[data-hero-bio]'))
-    expect(paragraphs).toHaveLength(2)
+    expect(container.querySelectorAll('[data-hero-bio]')).toHaveLength(2)
+  })
+
+  it('renders a single-paragraph bio as one paragraph', () => {
+    const { container } = render(<Hero settings={makeSettings({ bio: BIO_ONE })} />)
+    expect(container.querySelectorAll('[data-hero-bio]')).toHaveLength(1)
+  })
+
+  it('renders the location in the eyebrow', () => {
+    const { container } = render(<Hero settings={makeSettings()} />)
+    expect(readableText(container)).toContain('Gurugram, India')
   })
 
   it('keeps the section id', () => {
@@ -193,6 +174,11 @@ describe('Hero — calls to action', () => {
     expect(screen.queryByRole('link', { name: /r(é|e)sum(é|e)/i })).not.toBeInTheDocument()
   })
 
+  it('hides the résumé link when resumePdf is only whitespace', () => {
+    render(<Hero settings={makeSettings({ resumePdf: '  ' })} />)
+    expect(screen.queryByRole('link', { name: /r(é|e)sum(é|e)/i })).not.toBeInTheDocument()
+  })
+
   it('renders every social link', () => {
     render(<Hero settings={makeSettings()} />)
     expect(screen.getByRole('link', { name: /github/i })).toHaveAttribute(
@@ -204,26 +190,31 @@ describe('Hero — calls to action', () => {
       'https://linkedin.com/in/x',
     )
   })
+
+  it('renders no social links when there are none', () => {
+    render(<Hero settings={makeSettings({ socials: [] })} />)
+    expect(screen.queryByRole('link', { name: /github/i })).not.toBeInTheDocument()
+  })
 })
 
 describe('Hero — server HTML reads without JavaScript', () => {
   /**
-   * The strictest form of the guarantee. `renderToString` runs no effects and
-   * no GSAP, so this is exactly the markup a reader with JavaScript disabled —
-   * or a crawler, or a print stylesheet — receives.
+   * The strictest form of the guarantee. `renderToString` runs no effects, so
+   * this is exactly the markup a reader with JavaScript disabled — or a
+   * crawler, or a print stylesheet — receives.
    */
   it('ships every string, and nothing hidden, in the server HTML', async () => {
     const { renderToString } = await import('react-dom/server')
     const html = renderToString(<Hero settings={makeSettings()} />)
 
-    const text = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ')
+    const text = html
+      .replace(/<[^>]*>/g, '')
+      .replace(/&#x27;/g, "'")
+      .replace(/\s+/g, ' ')
     expect(text).toContain('Pranav Patil')
-    expect(text).toContain('Software Engineer')
-    expect(text).toContain('Backend &amp; Distributed Systems')
+    expect(text).toContain('Wio Bank')
     expect(text).toContain(BIO_ONE)
-    expect(text).toContain(BIO_TWO)
     expect(text).toContain('Get in touch')
-    expect(text).toContain('Explore')
 
     expect(html).not.toMatch(/opacity\s*:\s*0[;"]/)
     expect(html).not.toMatch(/class="[^"]*\bopacity-0\b/)
@@ -231,57 +222,34 @@ describe('Hero — server HTML reads without JavaScript', () => {
 })
 
 describe('Hero — motion', () => {
-  it('runs the GSAP reveal when motion is allowed', () => {
-    render(<Hero settings={makeSettings()} />)
-    expect(gsapCalls.from.length).toBeGreaterThan(0)
-  })
-
-  it('skips GSAP entirely under prefers-reduced-motion', () => {
-    mockMatchMedia(true)
-    render(<Hero settings={makeSettings()} />)
-    expect(gsapCalls.from).toHaveLength(0)
-    expect(gsapCalls.to).toHaveLength(0)
-  })
-
-  it('leaves nothing invisible under prefers-reduced-motion', () => {
+  it('renders in its final position under prefers-reduced-motion', () => {
     mockMatchMedia(true)
     const { container } = render(<Hero settings={makeSettings()} />)
     expect(invisibleElements(container)).toHaveLength(0)
+    expect(readableText(container)).toContain(HEADLINE_PLAIN)
   })
 
-  it('leaves nothing invisible when motion is allowed', () => {
-    // The markup's resting state is fully visible; GSAP animates *from* hidden.
-    // So even with the timeline stubbed out, every string is readable.
+  it('renders in its final position when motion is allowed', () => {
     const { container } = render(<Hero settings={makeSettings()} />)
     expect(invisibleElements(container)).toHaveLength(0)
   })
+})
 
-  it('renders the bio readably once BlurText can reveal it', () => {
-    // jsdom has no IntersectionObserver, so the component's plain fallback is
-    // what the other tests exercise. Supplying one takes the enhanced path and
-    // proves the text survives the swap rather than vanishing into it.
-    class FakeObserver {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-      takeRecords() {
-        return []
-      }
-      root = null
-      rootMargin = ''
-      thresholds = []
-    }
-    vi.stubGlobal('IntersectionObserver', FakeObserver)
-
-    const { container } = render(<Hero settings={makeSettings()} />)
-    expect(readableText(container)).toContain(BIO_ONE)
-
-    vi.unstubAllGlobals()
+describe('parseEmphasis', () => {
+  it('splits emphasised runs and excludes the markers', () => {
+    expect(parseEmphasis('a *b* c')).toEqual([
+      { text: 'a ', accent: false },
+      { text: 'b', accent: true },
+      { text: ' c', accent: false },
+    ])
   })
 
-  it('reverts its GSAP context on unmount so no inline opacity survives', () => {
-    const { unmount } = render(<Hero settings={makeSettings()} />)
-    unmount()
-    expect(gsapCalls.revert).toBeGreaterThan(0)
+  it('keeps an unpaired asterisk as literal text', () => {
+    // A stray marker must not swallow the rest of the sentence.
+    expect(parseEmphasis('rated 5* hotel')).toEqual([{ text: 'rated 5* hotel', accent: false }])
+  })
+
+  it('handles text with no emphasis at all', () => {
+    expect(parseEmphasis('plain')).toEqual([{ text: 'plain', accent: false }])
   })
 })

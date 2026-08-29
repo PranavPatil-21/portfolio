@@ -110,7 +110,11 @@ const projectFixture: Project[] = [
     slug: 'aes-double-pendulum',
     title: 'AES Cryptosystem via Double Pendulum',
     summary: 'Chaos-driven key generation for AES.',
-    body: 'long body text that must not be rendered on the card',
+    body:
+      '## The problem\n\nRestates the summary at four times the length.\n\n' +
+      '## The decision\n\nUse a `double pendulum` — the textbook **chaotic** system, ' +
+      'deterministic from a seed yet [practically](https://example.com) unpredictable ' +
+      'without it.\n\n## Later\n\nA third section that must not reach the card.',
     tech: ['C++', 'Cryptography'],
     repo: 'https://github.com/PranavPatil-21/aes',
     demo: 'https://example.com/demo',
@@ -193,16 +197,19 @@ const baseSettings: Settings = {
 // ---------------------------------------------------------------- Experience
 
 describe('Experience', () => {
-  it('leads with the company, keeps the role, and renders every bullet', () => {
+  it('renders company, role and every bullet for each role', () => {
     render(<Experience items={experienceFixture} />)
     expect(screen.getByRole('heading', { level: 2, name: /experience/i })).toBeInTheDocument()
-    // The company is the loud element in the cinematic timeline; the role is
-    // the supporting line beneath it.
+    // Each role is one compact row: the company heads it, the title sits on the
+    // line beneath, and the bullets carry what changed.
     expect(screen.getAllByRole('heading', { level: 3, name: 'Wio Bank PJSC' }).length).toBe(2)
     expect(screen.getByText('Software Engineer')).toBeInTheDocument()
+    // Exact-text matching, so the intern row does not satisfy the line above.
+    expect(screen.getByText('Software Engineer Intern')).toBeInTheDocument()
     expect(
       screen.getByText('Architected a Kafka-based lending billing engine.'),
     ).toBeInTheDocument()
+    expect(screen.getByText('Built a Spring Boot deduplication API.')).toBeInTheDocument()
   })
 
   it('labels a current role as Present and a finished role with its end date', () => {
@@ -267,13 +274,53 @@ describe('Projects', () => {
     expect(screen.getByText('C++')).toBeInTheDocument()
   })
 
-  it('numbers each project with an oversized editorial index', () => {
+  it('numbers each project with a quiet decorative index', () => {
     render(<Projects items={projectFixture} />)
     // Decorative, so it must not reach the accessibility tree as content.
     const index = document.querySelector('[data-testid="project-index"]')
     expect(index).not.toBeNull()
     expect(index).toHaveTextContent('01')
     expect(index).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('surfaces the decision passage as plain text, with its heading as a label', () => {
+    render(<Projects items={projectFixture} />)
+    // `summary` already carries the problem, so the excerpt skips the body's
+    // opening "The problem" section and lifts the reasoning instead.
+    expect(screen.getByText('The decision')).toBeInTheDocument()
+    expect(screen.queryByText(/Restates the summary/)).not.toBeInTheDocument()
+    // ...and the paragraph beneath it is flattened: no backticks, no asterisks,
+    // no link syntax, and no leading "##".
+    const excerpt = screen.getByText(/Use a double pendulum/)
+    expect(excerpt.textContent).toBe(
+      'Use a double pendulum — the textbook chaotic system, deterministic from a seed yet practically unpredictable without it.',
+    )
+    expect(document.body.textContent).not.toContain('##')
+    expect(document.body.textContent).not.toContain('](')
+  })
+
+  it('shows one passage of the body, not the whole write-up', () => {
+    render(<Projects items={projectFixture} />)
+    expect(screen.queryByText(/must not reach the card/)).not.toBeInTheDocument()
+    expect(screen.queryByText('Later')).not.toBeInTheDocument()
+  })
+
+  it('falls back to the opening passage when no section reads as a decision', () => {
+    const noDecision = [
+      { ...projectFixture[0], body: '## Background\n\nThe only passage there is.' },
+    ]
+    render(<Projects items={noDecision} />)
+    expect(screen.getByText('Background')).toBeInTheDocument()
+    expect(screen.getByText('The only passage there is.')).toBeInTheDocument()
+  })
+
+  it('gives a non-featured project the summary alone, with no body excerpt', () => {
+    const detailed = [
+      { ...projectWithoutLinks[0], body: '## The decision\n\nA supporting passage.' },
+    ]
+    render(<Projects items={detailed} />)
+    expect(screen.getByText('Expense splitting and debt simplification.')).toBeInTheDocument()
+    expect(screen.queryByText('A supporting passage.')).not.toBeInTheDocument()
   })
 
   it('renders the cover image with its alt text', () => {
@@ -310,6 +357,12 @@ describe('Skills', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Languages' })).toBeInTheDocument()
     expect(screen.getByText('Java')).toBeInTheDocument()
     expect(screen.getByText('PostgreSQL')).toBeInTheDocument()
+  })
+
+  it('lists every item in a group, each as its own element', () => {
+    render(<Skills groups={skillsFixture} />)
+    expect(screen.getByText('C/C++')).toBeInTheDocument()
+    expect(screen.getByText('MongoDB')).toBeInTheDocument()
   })
 
   it('returns null for an empty array', () => {
@@ -368,6 +421,16 @@ describe('Metrics', () => {
     expect(screen.getByText('<2s')).toBeInTheDocument()
   })
 
+  it('renders a comparison figure verbatim rather than counting one half of it', () => {
+    // Motion allowed: "3s → 1s" still must never read "0s → 1s" on screen, so
+    // it renders as typed from the first paint and starts no timer.
+    stubMatchMedia(false)
+    render(<Metrics items={[{ value: '3s → 1s', label: 'p95 dashboard latency' }]} />)
+    const figure = screen.getByText('3s → 1s')
+    expect(figure).toBeInTheDocument()
+    expect(figure).not.toHaveAttribute('aria-hidden')
+  })
+
   it('uses tabular figures so animated digits do not jitter', () => {
     stubMatchMedia(true)
     render(<Metrics items={metricsFixture} />)
@@ -418,6 +481,11 @@ describe('parseMetric', () => {
 
   it('returns null when there is nothing to count', () => {
     expect(parseMetric('N/A')).toBeNull()
+  })
+
+  it('returns null for a comparison, where animating one number would mislead', () => {
+    expect(parseMetric('3s → 1s')).toBeNull()
+    expect(parseMetric('40% of 800K')).toBeNull()
   })
 })
 

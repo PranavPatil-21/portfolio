@@ -4,21 +4,28 @@ import type { ReactNode } from 'react'
 import type { Article } from '@/content'
 import Articles from '@/components/sections/Articles'
 
+// Mirrors the real shell closely enough to matter: it must render the `action`
+// slot, because that is where the "All articles" link lives. A mock that
+// dropped it would make the index-link assertion below pass vacuously against a
+// component that never rendered the link at all.
 vi.mock('@/components/ui/SectionShell', () => ({
   default: ({
     id,
     title,
     subtitle,
     children,
+    action,
   }: {
     id: string
     title: string
     subtitle?: string
     children: ReactNode
+    action?: ReactNode
   }) => (
     <section id={id}>
       <h2>{title}</h2>
       {subtitle ? <p>{subtitle}</p> : null}
+      {action}
       {children}
     </section>
   ),
@@ -163,5 +170,30 @@ describe('<Articles />', () => {
   it('renders a link to the full article index', () => {
     render(<Articles items={[article()]} />)
     expect(screen.getByRole('link', { name: /all articles/i })).toHaveAttribute('href', '/articles')
+  })
+
+  it('keeps the "hosted elsewhere" marker as inert text, not a second link', () => {
+    render(
+      <Articles
+        items={[
+          article({
+            hasFullText: false,
+            externalUrl: 'https://medium.com/@pranav/medium-post',
+          }),
+        ]}
+      />,
+    )
+    expect(screen.queryByRole('link', { name: /hosted on medium/i })).not.toBeInTheDocument()
+    // the article title, plus the "all articles" link — the badge adds neither
+    expect(screen.getAllByRole('link')).toHaveLength(2)
+  })
+
+  it('renders the list as an ordered contents rail, one row per article', () => {
+    const { container } = render(
+      <Articles items={[article(), article({ slug: 'second', title: 'Second Post' })]} />,
+    )
+    const list = container.querySelector('ol')
+    expect(list).not.toBeNull()
+    expect(list?.querySelectorAll(':scope > li')).toHaveLength(2)
   })
 })

@@ -11,7 +11,15 @@ export default defineConfig({
   reporter: [['list']],
   use: { baseURL, trace: 'on-first-retry' },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      // The no-JS suite asserts that nothing is left transparent. With
+      // JavaScript enabled that is false by design — below-the-fold elements sit
+      // at opacity 0 until they scroll into view — so it belongs only to the
+      // project that actually disables scripting.
+      testIgnore: /nojs\.spec\.ts/,
+    },
     {
       // Proves the site is readable without JS — the spec requires all content
       // to be server-rendered DOM, never locked inside the canvas or a client fetch.

@@ -12,6 +12,7 @@ import type {
 } from '@/content'
 
 import Hero from '@/components/sections/Hero'
+import CurrentRole from '@/components/sections/CurrentRole'
 import Experience from '@/components/sections/Experience'
 import Projects from '@/components/sections/Projects'
 import Skills from '@/components/sections/Skills'
@@ -77,6 +78,16 @@ function renderSection(
   switch (id) {
     case 'hero':
       return <Hero settings={c.settings} />
+    case 'current': {
+      /*
+       * The role the owner holds today, given its own featured block rather
+       * than being one row in a timeline. "Emphasise my current experience"
+       * is the brief; `current: true` is how the CMS expresses which one that
+       * is, with the most recent role as a fallback if the flag is unset.
+       */
+      const role = c.experience.find((e) => e.current) ?? c.experience[0]
+      return role ? <CurrentRole role={role} settings={c.settings} /> : null
+    }
     case 'metrics':
       return <Metrics items={c.metrics} />
     case 'experience':

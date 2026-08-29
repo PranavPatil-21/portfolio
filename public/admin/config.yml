@@ -84,6 +84,16 @@ collections:
               At least one is required. The first one is used as your job title
               in search results and on the social sharing image.
 
+          - name: headline
+            label: Headline
+            widget: text
+            required: false
+            hint: >-
+              The big sentence under your name — the most important text on the
+              site. Say what you do now and where you are heading. Wrap a phrase
+              in *asterisks* to highlight it in your accent colour. Leave empty
+              and the first sentence of your bio is used instead.
+
           - name: bio
             label: Bio
             widget: text
@@ -281,8 +291,11 @@ collections:
                 widget: string
                 required: true
                 hint: >-
-                  Built-in sections are: hero, experience, projects, skills,
-                  articles, education, responsibilities, contact. For a custom
+                  Built-in sections are: hero, current, metrics, experience,
+                  projects, skills, articles, education, responsibilities,
+                  contact. "current" is the featured block for the job you hold
+                  now; it uses whichever experience entry is ticked Current. For
+                  a custom
                   section, use its file name from the Custom Sections
                   collection.
               - name: visible

@@ -40,7 +40,7 @@ export function CustomSection({ section }: { section: CustomSectionData }) {
   return (
     <SectionShell
       id={`custom:${section.slug}`}
-      eyebrow="Also"
+      eyebrow="More"
       title={section.title}
       subtitle={section.body || undefined}
     >

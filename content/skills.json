@@ -42,14 +42,15 @@
       ]
     },
     {
-      "label": "Foundations",
+      "label": "Lending & Fintech Domain",
       "items": [
-        "Data Structures & Algorithms",
-        "OOP",
-        "Operating Systems",
-        "DBMS",
-        "Computer Networks",
-        "C/C++"
+        "Retail & SME Lending",
+        "Secured / FD-Backed Credit",
+        "Loan Lifecycle Orchestration",
+        "Billing & Reconciliation",
+        "Credit Limit Workflows",
+        "Underwriting Validation",
+        "Payments & Notifications"
       ]
     }
   ]

@@ -1,6 +1,6 @@
 ---
 title: WioGenie — Multi-Agent Incident Investigator
-summary: A multi-agent AI system that investigates production incidents by reasoning across code, logs, Jira and RCA documents — and cites its sources for every claim. Built at Wio Bank and approved by engineering leadership for adoption.
+summary: When production breaks, the slow part is the archaeology — stitching a stack trace to source, an old Jira thread and a half-remembered RCA. WioGenie is a multi-agent AI system that does that stitching and cites its source for every claim; built at Wio Bank and approved by engineering leadership for adoption.
 date: "2026"
 order: 0
 featured: true

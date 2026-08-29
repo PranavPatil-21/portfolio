@@ -12,53 +12,49 @@ import { Reveal } from '@/components/ui/Reveal'
  */
 export function LogoGridLayout({ items }: CustomLayoutProps) {
   return (
-    <ul className="grid list-none grid-cols-2 gap-4 p-0 sm:grid-cols-3 lg:grid-cols-4">
+    <ul className="grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 lg:grid-cols-4">
       {items.map((item, index) => (
         <li key={`${item.title}-${index}`}>
-          <Reveal delay={index * 0.05}>
-            <figure className="group m-0 flex h-full flex-col items-center gap-4 rounded-2xl border border-[var(--hairline)] bg-[var(--surface)] p-6 text-center transition-colors duration-500 hover:border-[color-mix(in_oklab,var(--accent)_45%,transparent)] motion-reduce:transition-none">
-              <div className="flex h-16 w-full items-center justify-center">
+          <Reveal delay={index * 0.04}>
+            <figure className="group m-0 flex h-full flex-col items-center gap-3 rounded-lg border border-[var(--hairline)] bg-[var(--surface)] p-5 text-center transition-colors duration-200 hover:border-[color-mix(in_oklab,var(--accent)_38%,transparent)] motion-reduce:transition-none">
+              <div className="flex h-12 w-full items-center justify-center">
                 {item.image ? (
                   <img
                     src={item.image}
                     alt={item.imageAlt ?? ''}
                     loading="lazy"
-                    className="max-h-16 w-auto max-w-full object-contain opacity-60 transition-opacity duration-500 group-hover:opacity-100 motion-reduce:transition-none"
+                    className="max-h-12 w-auto max-w-full object-contain opacity-70 transition-opacity duration-200 group-hover:opacity-100 motion-reduce:transition-none"
                   />
                 ) : (
                   <span
                     aria-hidden="true"
-                    className="font-mono text-2xl font-semibold text-[var(--foreground)]/55"
+                    className="font-mono text-xl font-semibold text-[var(--subtle)]"
                   >
                     {item.title.slice(0, 2).toUpperCase()}
                   </span>
                 )}
               </div>
 
-              <figcaption className="flex flex-col items-center gap-2">
+              <figcaption className="flex flex-col items-center gap-1">
                 <span className="text-sm leading-snug font-semibold text-[var(--foreground)]">
                   {item.title}
                 </span>
 
                 {item.subtitle ? (
-                  <span className="text-xs text-[var(--foreground)]/60">{item.subtitle}</span>
+                  <span className="text-[13px] text-[var(--muted)]">{item.subtitle}</span>
                 ) : null}
 
-                {item.date ? (
-                  <span className="font-mono text-[10px] tracking-[0.35em] text-[var(--foreground)]/55 uppercase">
-                    {item.date}
-                  </span>
-                ) : null}
+                {item.date ? <span className="eyebrow tabular">{item.date}</span> : null}
 
                 {item.description ? (
-                  <span className="text-xs leading-relaxed text-[var(--foreground)]/60">
+                  <span className="text-[13px] leading-relaxed text-[var(--muted)]">
                     {item.description}
                   </span>
                 ) : null}
               </figcaption>
 
               {item.tags.length > 0 ? (
-                <ul className="flex list-none flex-wrap justify-center gap-2 p-0">
+                <ul className="flex list-none flex-wrap justify-center gap-1.5 p-0">
                   {item.tags.map((tag) => (
                     <li key={tag}>
                       <Tag>{tag}</Tag>
@@ -68,12 +64,12 @@ export function LogoGridLayout({ items }: CustomLayoutProps) {
               ) : null}
 
               {item.links.length > 0 ? (
-                <ul className="mt-auto flex list-none flex-wrap justify-center gap-x-5 gap-y-2 p-0 pt-1">
+                <ul className="mt-auto flex list-none flex-wrap justify-center gap-x-4 gap-y-1 p-0 pt-1">
                   {item.links.map((link) => (
                     <li key={link.url}>
                       <a
                         href={link.url}
-                        className="font-mono text-[10px] tracking-[0.28em] text-[var(--accent-readable)] uppercase underline-offset-8 transition-colors duration-300 hover:underline motion-reduce:transition-none"
+                        className="text-[13px] text-[var(--accent-readable)] underline-offset-4 transition-colors duration-200 hover:underline motion-reduce:transition-none"
                       >
                         {link.label}
                       </a>

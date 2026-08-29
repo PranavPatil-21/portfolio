@@ -20,6 +20,9 @@ export type Metric = {
  * `decimals` is taken from the literal the owner wrote rather than inferred, so
  * "99.9%" counts through 12.3 → 99.9 instead of rounding through integers and
  * landing on a value ("100%") they never typed.
+ *
+ * Returns `null` — meaning "render this verbatim, do not animate it" — when the
+ * string holds no digits at all, or more than one run of them.
  */
 export function parseMetric(value: string): {
   prefix: string
@@ -33,6 +36,12 @@ export function parseMetric(value: string): {
   const [, prefix, digits, suffix] = match
   const target = Number(digits.replace(/,/g, ''))
   if (Number.isNaN(target)) return null
+
+  // A second run of digits after the first means the string is a *comparison*,
+  // not a quantity — "3s → 1s". Counting the first number while the second sits
+  // there fixed reads as "0s → 1s" for most of the animation, which states
+  // something untrue about the work. Figures like this render immediately.
+  if (/\d/.test(suffix)) return null
 
   const dot = digits.indexOf('.')
   return {
@@ -153,17 +162,17 @@ function MetricFigure({ metric, reduced }: { metric: Metric; reduced: boolean })
   }, [animatable, metric.value, parsed?.prefix, parsed?.suffix, parsed?.target, parsed?.decimals]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <li className="border-t border-[var(--hairline)] pt-6">
+    <li className="border-t border-[var(--hairline)] pt-4">
       <p
         ref={ref}
         data-testid="metric-value"
         aria-hidden={animatable ? 'true' : undefined}
-        className="tabular text-5xl leading-none font-black tracking-tighter text-[var(--foreground)] sm:text-6xl md:text-7xl"
+        className="tabular text-2xl leading-none font-semibold tracking-tight text-[var(--foreground)] sm:text-3xl"
       >
         {display}
       </p>
       {animatable ? <span className="sr-only">{metric.value}</span> : null}
-      <p className="mt-4 max-w-[26ch] font-mono text-[11px] leading-relaxed tracking-[0.12em] text-[var(--foreground)]/55 uppercase">
+      <p className="mt-2 max-w-[30ch] text-[13px] leading-snug text-[var(--muted)]">
         {metric.label}
       </p>
     </li>
@@ -171,11 +180,16 @@ function MetricFigure({ metric, reduced }: { metric: Metric; reduced: boolean })
 }
 
 /**
- * The outcomes, stated as numbers and nothing else.
+ * The outcomes, stated as numbers.
  *
- * This is the loudest block on the page by design: it is the argument, and the
- * sections around it are the evidence. Returns `null` for an empty list so an
- * unfilled collection omits the section rather than shipping a bare heading.
+ * Deliberately *not* the loudest block on the page. An earlier version set these
+ * at 7xl black and the row became a poster that a reader had to scroll past to
+ * reach the work it referred to. Evidence reads as evidence when it sits at the
+ * same scale as the prose around it — the figures are dense, quiet and
+ * verifiable against the roles and projects below.
+ *
+ * Returns `null` for an empty list so an unfilled collection omits the section
+ * rather than shipping a bare heading.
  */
 export function Metrics({ items }: { items: Metric[] }) {
   const reduced = usePrefersReducedMotion()
@@ -187,10 +201,9 @@ export function Metrics({ items }: { items: Metric[] }) {
       id="metrics"
       eyebrow="Measured"
       title="Impact"
-      index="01 / IMPACT"
       subtitle="What the work moved, in the numbers the business kept score with."
     >
-      <ul className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
           <MetricFigure key={`${item.value}-${item.label}`} metric={item} reduced={reduced} />
         ))}

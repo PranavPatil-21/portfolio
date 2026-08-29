@@ -13,5 +13,4 @@ bullets:
   - "Grew SME conversion and retention by *42%* with FD-backed lending journeys — designing the secured-credit workflow, eligibility computation, approval pipeline and risk validations."
   - "Cut credit card dashboard p95 latency from *3s to 1s* and lifted throughput *50%* under peak load, through query tuning, indexing and caching."
   - "Owned the Spring Boot lending microservices behind multiple Retail and SME loan products — the loan lifecycle orchestration, service integrations and REST APIs every product journey depends on."
-  - "Kept margin-trading leverage eligibility consistent by building an event-driven pipeline over salary uploads and file events, maintaining continuously reconciled blob-based records."
 ---

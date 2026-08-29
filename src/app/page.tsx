@@ -12,10 +12,6 @@ import {
 } from '@/content'
 import { fetchMediumArticles } from '@/lib/medium'
 import Nav from '@/components/Nav'
-import SmoothScroll from '@/components/SmoothScroll'
-import Cursor from '@/components/Cursor'
-import Grain from '@/components/Grain'
-import Backdrop from '@/components/Backdrop'
 import Footer from '@/components/Footer'
 import SectionRenderer from '@/components/SectionRenderer'
 
@@ -46,38 +42,52 @@ export default async function Home() {
 
   const customTitles = new Map(customSections.map((s) => [`custom:${s.slug}`, s.title]))
 
+  const experience = getExperience()
+  const projects = getProjects()
+  const skills = getSkills()
+  const education = getEducation()
+  const responsibilities = getResponsibilities()
+  const metrics = getMetrics()
+
+  /*
+   * Sections listed in the layout that will render nothing, because their
+   * collection is empty. The nav drops their anchors — a link that scrolls
+   * nowhere is worse than a missing one, and emptying a collection from the CMS
+   * is a normal thing for the owner to do.
+   */
+  const emptyIds = new Set<string>()
+  if (!experience.some((e) => e.current) && experience.length === 0) emptyIds.add('current')
+  if (!experience.length) emptyIds.add('experience')
+  if (!projects.length) emptyIds.add('projects')
+  if (!skills.length) emptyIds.add('skills')
+  if (!articles.length) emptyIds.add('articles')
+  if (!education.length) emptyIds.add('education')
+  if (!responsibilities.length) emptyIds.add('responsibilities')
+  if (!metrics.length) emptyIds.add('metrics')
+  for (const section of customSections) {
+    if (!section.items.length) emptyIds.add(`custom:${section.slug}`)
+  }
+
   return (
     <>
-      {/*
-        Chrome that wraps the whole page. Each of these renders nothing at all
-        when the environment says it should not run — reduced motion for the
-        smooth scroll and the cursor, coarse pointers for the cursor — so none
-        of them needs a second guard here.
-      */}
-      <Backdrop enabled={settings.features.hero3d} />
-      <SmoothScroll />
-      <Cursor />
-      <Grain />
 
-      <Nav layout={layout} settings={settings} customTitles={customTitles} />
+      <Nav layout={layout} settings={settings} customTitles={customTitles} emptyIds={emptyIds} />
       <main id="main" className="flex-1">
         <SectionRenderer
           layout={layout}
           content={{
             settings,
-            experience: getExperience(),
-            projects: getProjects(),
-            skills: getSkills(),
-            education: getEducation(),
-            responsibilities: getResponsibilities(),
+            experience,
+            projects,
+            skills,
+            education,
+            responsibilities,
             articles,
-            metrics: getMetrics(),
+            metrics,
             customSections,
           }}
         />
       </main>
-      {/* Masks the hard bottom edge of the viewport so sections drift out of frame. */}
-      <div className="bottom-blur" aria-hidden="true" />
 
       <Footer settings={settings} />
     </>

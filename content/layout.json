@@ -5,6 +5,10 @@
       "visible": true
     },
     {
+      "sectionId": "current",
+      "visible": true
+    },
+    {
       "sectionId": "metrics",
       "visible": true
     },
@@ -25,11 +29,11 @@
       "visible": true
     },
     {
-      "sectionId": "education",
+      "sectionId": "responsibilities",
       "visible": true
     },
     {
-      "sectionId": "responsibilities",
+      "sectionId": "education",
       "visible": true
     },
     {

@@ -1,329 +1,166 @@
-'use client'
-
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
 import type { Settings } from '@/content'
-import BlurText from '@/components/ui/BlurText'
 import Magnetic from '@/components/ui/Magnetic'
 
 /**
  * The hero.
  *
- * **On the client directive.** GSAP needs a client boundary, and `'use client'`
- * is a *file*-level directive — a module cannot hold a server component and a
- * client one. Since the choreography and the markup are required to live in
- * this one file, the file is the boundary. That costs nothing that matters
- * here: a client component is still rendered to HTML on the server, so the
- * name, roles, bio and every call-to-action ship in the initial document and
- * the page reads with JavaScript disabled. What it does *not* do is let the
- * copy stay out of the client bundle; if that ever matters, the fix is to move
- * `HeroChoreography` into its own file and make this one a server component
- * again, which is a two-minute change because the split is already drawn.
+ * **A server component, deliberately.** The previous version was a client
+ * component because GSAP needed a boundary; there is no GSAP here, no canvas
+ * and no reveal, so the whole thing renders to HTML on the server and ships no
+ * copy in the client bundle. `Magnetic` is a `'use client'` leaf — importing it
+ * from a server component is the normal composition, and it renders fine under
+ * `renderToString`.
  *
- * **On stranded content.** Every element's *resting* state is fully visible.
- * There is no `opacity-0` anywhere in this markup. GSAP animates *from* a
- * hidden state toward that resting state, so every failure mode — no JS, a
- * GSAP import failure, reduced motion, an effect that never fires — lands on
- * legible text rather than an invisible page. The reverse (markup hidden, JS
- * reveals it) is the same animation and a far worse failure mode.
+ * **Nothing animates in.** Not an oversight. A scroll-reveal on the fold is a
+ * contradiction — it is already in view — and any `initial={{ opacity: 0 }}`
+ * writes `style="opacity:0"` into the server HTML, which is precisely the
+ * failure mode where the page scores well on every other check and the owner's
+ * name is invisible. The resting state *is* the only state.
+ *
+ * **The budget is 1440×900.** No `min-h-[100svh]`, no `py-28`. A hiring manager
+ * skimming for thirty seconds should reach the evidence without scrolling past
+ * a poster, so the eyebrow, name, positioning line, bio and every call to
+ * action fit in one screen with the next section's edge visible beneath them.
  */
 export default function Hero({ settings }: { settings: Settings }) {
-  const { name, roles, bio, location, email, resumePdf, socials } = settings
+  const { name, roles, bio, headline, location, email, resumePdf, socials } = settings
+
+  /*
+   * The positioning sentence. It lives in the CMS rather than in this file:
+   * it is the most important text on the site, and the owner must be able to
+   * change what he claims about himself without a code change.
+   *
+   * Falls back to the bio's first sentence so the hero is never headless if the
+   * field is cleared.
+   */
+  const positioning = headline?.trim()
+    ? headline
+    : (bio.split(/(?<=\.)\s/)[0] ?? bio)
 
   // The CMS clears a text field to `''`, not to nothing, so "set" has to mean
   // non-empty — otherwise clearing the field publishes a link to the site root.
   const resumeHref = resumePdf?.trim() ? resumePdf : null
 
-  // One `BlurText` per paragraph. Authors separate thoughts with a blank line
-  // in the CMS textarea; rendering that as one wall of text loses the pacing.
+  // Location and headline role, whichever exist. Joined here rather than in the
+  // markup so an empty `location` cannot leave a dangling separator.
+  const eyebrow = [location, roles[0]].filter((part) => part?.trim()).join('  ·  ')
+
+  // Authors separate thoughts with a blank line in the CMS textarea; rendering
+  // that as one wall of text loses the pacing.
   const paragraphs = bio
     .split(/\n\s*\n/)
-    .map((part) => part.replace(/\s*\n\s*/g, ' ').trim())
+    .map((part) => part.replace(/\s*\n\s*/g, ' ').replace(/\*/g, '').trim())
     .filter(Boolean)
 
   return (
-    <section
-      id="hero"
-      className="relative isolate flex min-h-[100svh] items-center overflow-hidden px-6 py-28 sm:px-10 lg:px-16"
-    >
-      {/*
-        The portrait takes the right of the frame on wide screens so it reads as
-        a subject beside the copy rather than a wash behind it. On narrow
-        screens it fills the section and the scrims below carry legibility.
-      */}
+    <section id="hero" className="px-6 pt-16 pb-14 sm:px-8 md:pt-24 md:pb-20">
+      <div className="mx-auto w-full max-w-5xl">
+        {eyebrow ? (
+          <p className="eyebrow mb-6 flex items-center gap-2.5">
+            <span
+              aria-hidden="true"
+              className="inline-block size-1.5 shrink-0 rounded-full bg-[var(--accent-readable)]"
+            />
+            {eyebrow}
+          </p>
+        ) : null}
 
-      {/*
-        Three scrims, because the particle portrait is bright in places and text
-        contrast cannot depend on where a procedurally-animated particle happens
-        to drift. The horizontal one guarantees a dark base under the copy
-        column; the vertical one blends the canvas into the next section; the
-        third is a low-opacity flat wash that lifts the floor everywhere else.
-      */}
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-[var(--background)] via-[var(--background)]/92 to-[var(--background)]/45 sm:via-[var(--background)]/80 sm:to-transparent" />
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[var(--background)]/60 via-transparent to-[var(--background)]" />
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-[var(--background)]/25" />
+        <h1 className="display text-[var(--foreground)]">{name}</h1>
 
-      <HeroChoreography>
-        <div className="mx-auto w-full max-w-6xl">
-          <div className="max-w-2xl">
-            {location ? (
-              <p className="hero-eyebrow mb-7 flex items-center gap-3 font-mono text-[10px] tracking-[0.3em] text-[var(--accent-readable)] uppercase md:text-xs">
-                <span
-                  aria-hidden="true"
-                  className="inline-block size-1.5 shrink-0 animate-pulse rounded-full bg-[var(--accent-readable)] motion-reduce:animate-none"
-                />
-                {location}
-              </p>
-            ) : null}
+        {/*
+          The most important text on the site. Everything after this is the
+          reader choosing to keep going; this sentence has to earn that on its
+          own, so it sits directly under the name at a size the eye lands on
+          before it lands on the body copy.
 
-            {/*
-              Two voices. The outlined italic serif is quiet and human; the name
-              underneath is the shout. `aria-label` carries the whole heading so
-              a screen reader is never handed the per-letter split, while the
-              letters themselves remain real text nodes for crawlers and for
-              anyone reading with styles off.
-            */}
-            <h1
-              className="relative mb-10 flex flex-col leading-[0.75] font-black tracking-tighter"
-              aria-label={`${GHOST_LINE} ${name}`}
+          `text-pretty`, not `text-balance`: balancing is meant for headings of
+          a line or two and would even out this sentence's four lines by
+          breaking its two beats — what he does now, where he is going — at
+          arbitrary points. Pretty only fixes the orphan.
+        */}
+        <p
+          data-positioning=""
+          className="mt-6 max-w-[48ch] text-lg leading-[1.45] font-medium text-pretty text-[var(--foreground)] md:text-[22px]"
+        >
+          {parseEmphasis(positioning).map((part, i) =>
+            part.accent ? (
+              <span key={i} className="text-[var(--accent-readable)]">
+                {part.text}
+              </span>
+            ) : (
+              <span key={i}>{part.text}</span>
+            ),
+          )}
+        </p>
+
+        <div className="mt-6 flex max-w-[64ch] flex-col gap-3.5">
+          {paragraphs.map((paragraph, i) => (
+            <p
+              key={i}
+              data-hero-bio=""
+              className="text-[15px] leading-relaxed text-[var(--muted)]"
             >
-              <span
-                aria-hidden="true"
-                className="hero-ghost ghost block text-[clamp(2.6rem,9.5vw,7.5rem)] leading-[0.9]"
-              >
-                {GHOST_LINE}
-              </span>
-              <span
-                aria-hidden="true"
-                className="hero-name -mt-[0.18em] block text-[clamp(3.25rem,13vw,10rem)] text-[var(--foreground)]"
-                style={{ perspective: '600px' }}
-              >
-                {splitLetters(name).map((char, i) => (
-                  <span key={`${char}-${i}`} className="hero-letter inline-block">
-                    {char}
-                  </span>
-                ))}
-              </span>
-            </h1>
-
-            <ul className="hero-supporting mb-8 flex flex-wrap items-center gap-x-2.5 gap-y-2">
-              {roles.map((role) => (
-                <li
-                  key={role}
-                  className="rounded-full border border-[var(--hairline)] bg-[var(--surface)] px-3.5 py-1.5 font-mono text-[10px] tracking-[0.14em] text-[var(--foreground)]/75 uppercase backdrop-blur-sm md:text-xs"
-                >
-                  {role}
-                </li>
-              ))}
-            </ul>
-
-            <HeroBio paragraphs={paragraphs} />
-
-            <div className="hero-supporting mt-10 flex flex-wrap items-center gap-x-3 gap-y-3">
-              <Magnetic>
-                <a
-                  href={`mailto:${email}`}
-                  className="inline-block rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--accent-contrast)] transition hover:opacity-90 motion-reduce:transition-none"
-                >
-                  Get in touch
-                </a>
-              </Magnetic>
-
-              {resumeHref ? (
-                <Magnetic>
-                  <a
-                    href={resumeHref}
-                    className="inline-block rounded-full border border-[var(--hairline)] px-6 py-3 text-sm font-medium transition hover:border-[var(--accent)] motion-reduce:transition-none"
-                  >
-                    Download résumé
-                  </a>
-                </Magnetic>
-              ) : null}
-
-              {socials.map((social) => (
-                <a
-                  key={social.url}
-                  href={social.url}
-                  rel="noreferrer noopener"
-                  target="_blank"
-                  className="rounded-full px-3 py-3 font-mono text-[10px] tracking-[0.2em] text-[var(--foreground)]/55 uppercase underline-offset-4 transition hover:text-[var(--foreground)] hover:underline motion-reduce:transition-none md:text-xs"
-                >
-                  {social.label}
-                </a>
-              ))}
-            </div>
-
-            <p className="hero-supporting mt-12 font-mono text-[10px] tracking-[0.4em] text-[var(--foreground)]/55 uppercase">
-              Explore ↓
+              {paragraph}
             </p>
-          </div>
+          ))}
         </div>
-      </HeroChoreography>
+
+        <div className="mt-9 flex flex-wrap items-center gap-x-3 gap-y-3">
+          <Magnetic>
+            <a
+              href={`mailto:${email}`}
+              className="inline-block rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-medium text-[var(--accent-contrast)] transition-opacity hover:opacity-90 motion-reduce:transition-none"
+            >
+              Get in touch
+            </a>
+          </Magnetic>
+
+          {resumeHref ? (
+            <a
+              href={resumeHref}
+              className="inline-block rounded-lg border border-[var(--hairline)] px-5 py-2.5 text-sm font-medium text-[var(--foreground)] transition-colors hover:border-[var(--accent)] motion-reduce:transition-none"
+            >
+              Résumé
+            </a>
+          ) : null}
+
+          {socials.length ? (
+            <span aria-hidden="true" className="mx-1 h-4 w-px bg-[var(--hairline)]" />
+          ) : null}
+
+          {socials.map((social) => (
+            <a
+              key={social.url}
+              href={social.url}
+              rel="noreferrer noopener"
+              target="_blank"
+              className="rounded-md px-1 py-2 text-sm text-[var(--subtle)] underline-offset-4 transition-colors hover:text-[var(--foreground)] hover:underline motion-reduce:transition-none"
+            >
+              {social.label}
+            </a>
+          ))}
+        </div>
+      </div>
     </section>
   )
 }
 
 /**
- * The quiet half of the heading pair. Deliberately not a CMS field: it is
- * grammatical scaffolding for the name, not content, and pulling it from
- * `roles` would print the same string twice in two different type treatments.
- */
-const GHOST_LINE = "Hey, I'm"
-
-/**
- * Splits for per-letter animation, with spaces as non-breaking so an
- * `inline-block` letter run does not collapse them. ` ` still normalises
- * to a space for `textContent`, so the name reads intact to anything parsing
- * the DOM.
- */
-function splitLetters(value: string): string[] {
-  return Array.from(value).map((char) => (char === ' ' ? ' ' : char))
-}
-
-/**
- * `useLayoutEffect` warns when React renders on the server, but `useEffect`
- * runs *after* paint — which would show one painted frame of the plain bio
- * before the reveal replaces it. Aliasing per environment is the standard
- * resolution and is what `motion` itself does internally.
- */
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
-
-/**
- * The bio, as progressive enhancement.
+ * Splits `*emphasised*` runs out of a string.
  *
- * `BlurText` reveals words on scroll via `IntersectionObserver`, and it renders
- * its starting state — `opacity: 0` — into the server HTML. Used directly, that
- * would make the bio *invisible* to a reader with JavaScript disabled, and
- * permanently invisible in any browser without `IntersectionObserver`: the
- * observer that was going to reveal it never exists. The text would be in the
- * DOM and unreadable, which is the exact failure this hero is built to avoid.
- *
- * So the server renders plain, visible paragraphs, and the reveal is swapped in
- * only once the client has confirmed it can actually finish the job. The swap
- * happens in a layout effect, before paint, so there is no flash.
+ * Markers are excluded by construction rather than stripped afterwards, and an
+ * unpaired asterisk survives as literal text instead of swallowing the rest of
+ * the sentence.
  */
-function HeroBio({ paragraphs }: { paragraphs: string[] }) {
-  const [canReveal, setCanReveal] = useState(false)
-
-  useIsomorphicLayoutEffect(() => {
-    if (typeof IntersectionObserver !== 'undefined') setCanReveal(true)
-  }, [])
-
-  return (
-    <div className="hero-supporting flex max-w-xl flex-col gap-5">
-      {paragraphs.map((paragraph, i) => {
-        const className =
-          i === 0
-            ? 'text-base leading-[1.65] font-medium text-[var(--foreground)]/70 md:text-[17px]'
-            : 'text-sm leading-relaxed font-light text-[var(--foreground)]/60'
-
-        return (
-          <div key={i} data-hero-bio="">
-            {canReveal ? (
-              <BlurText
-                text={paragraph}
-                delay={0.1 + i * 0.08}
-                stagger={0.02}
-                className={className}
-              />
-            ) : (
-              <p className={className}>{stripEmphasis(paragraph)}</p>
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-/** Mirrors `BlurText`'s handling of `*emphasis*` so the swap is invisible. */
-function stripEmphasis(value: string): string {
-  return value.replace(/\*/g, '')
-}
-
-/**
- * The GSAP layer. Owns nothing but timing — it renders its children unchanged
- * and animates them by class within a `gsap.context` scoped to its own subtree.
- *
- * Under `prefers-reduced-motion` it returns before touching GSAP at all, which
- * is why reduced motion cannot strand anything: with no tween there is no
- * inline style, and the markup's resting state is already the final one.
- */
-export function HeroChoreography({ children }: { children: ReactNode }) {
-  const scope = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    gsap.registerPlugin(ScrollTrigger)
-
-    const ctx = gsap.context(() => {
-      gsap.from('.hero-eyebrow', {
-        y: 18,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        delay: 0.25,
-      })
-
-      gsap.from('.hero-ghost', {
-        y: 70,
-        opacity: 0,
-        duration: 1.1,
-        ease: 'power4.out',
-        delay: 0.4,
-      })
-
-      // The signature move: the name assembles letter by letter, each one
-      // rotating up out of the page plane.
-      gsap.from('.hero-letter', {
-        y: 100,
-        opacity: 0,
-        rotateX: -40,
-        stagger: 0.06,
-        duration: 1.2,
-        ease: 'power4.out',
-        delay: 0.5,
-      })
-
-      gsap.from('.hero-supporting', {
-        y: 26,
-        opacity: 0,
-        stagger: 0.12,
-        duration: 0.9,
-        ease: 'power3.out',
-        delay: 1.1,
-      })
-
-      // Drifts the copy out of frame as the hero leaves, so the section hands
-      // over rather than cutting. `scrub` ties it to scroll position, which
-      // means it reverses cleanly when the reader scrolls back up.
-      if (scope.current) {
-        gsap.to(scope.current, {
-          opacity: 0,
-          y: -50,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: scope.current,
-            start: 'bottom 65%',
-            end: 'bottom 15%',
-            scrub: 1.1,
-          },
-        })
-      }
-    }, scope)
-
-    // Reverting restores every property GSAP touched, so an unmount mid-tween
-    // cannot leave a half-faded inline style behind.
-    return () => ctx.revert()
-  }, [])
-
-  return (
-    <div ref={scope} className="relative z-10 w-full">
-      {children}
-    </div>
-  )
+export function parseEmphasis(text: string): { text: string; accent: boolean }[] {
+  const parts: { text: string; accent: boolean }[] = []
+  let last = 0
+  for (const match of text.matchAll(/\*([^*]+)\*/g)) {
+    const at = match.index ?? 0
+    if (at > last) parts.push({ text: text.slice(last, at), accent: false })
+    parts.push({ text: match[1], accent: true })
+    last = at + match[0].length
+  }
+  if (last < text.length) parts.push({ text: text.slice(last), accent: false })
+  return parts
 }
