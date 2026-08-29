@@ -20,10 +20,43 @@ const hexColour = z
  * back to `YYYY-MM-DD` before validating rather than making every editor
  * remember to quote the field.
  */
-const dateish = z.preprocess(
-  (v) => (v instanceof Date ? v.toISOString().slice(0, 10) : v),
-  z.string().regex(/^\d{4}(-\d{2})?(-\d{2})?$/, 'use YYYY, YYYY-MM or YYYY-MM-DD'),
-)
+const dateish = z.preprocess((v) => {
+  if (v instanceof Date) return v.toISOString().slice(0, 10)
+  // A `datetime` widget with picker_utc emits a full ISO timestamp
+  // ("2026-08-29T00:00:00.000Z"). Keep the date half.
+  if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(v)) return v.slice(0, 10)
+  return v
+}, z.string().regex(/^\d{4}(-\d{2})?(-\d{2})?$/, 'use YYYY, YYYY-MM or YYYY-MM-DD'))
+
+/**
+ * A sort-order field as a CMS actually writes it.
+ *
+ * A cleared `number` widget emits `''` or `null`, and a populated one can emit
+ * a numeric *string*. Plain `z.number().default(0)` rejects all three, so
+ * clearing the order box would fail the build.
+ */
+const orderField = z.preprocess((v) => {
+  if (v === '' || v === null || v === undefined) return 0
+  if (typeof v === 'string' && v.trim() !== '' && !Number.isNaN(Number(v))) return Number(v)
+  return v
+}, z.number())
+
+/**
+ * A list of non-empty strings, tolerant of how a `list` widget behaves.
+ *
+ * Adding a row and leaving it blank emits `''`. Requiring `.min(1)` on the
+ * element would then fail the build for a stray empty row — a mistake that is
+ * one keystroke away and invisible in the editor. Drop blanks instead.
+ */
+function stringList() {
+  return z.preprocess(
+    (v) =>
+      Array.isArray(v)
+        ? v.filter((item) => typeof item !== 'string' || item.trim() !== '')
+        : v,
+    z.array(z.string().min(1)).default([]),
+  )
+}
 
 /**
  * Makes a field optional in the way a *CMS* means it.
@@ -50,7 +83,7 @@ export const socialSchema = z.object({
 
 export const settingsSchema = z.object({
   name: z.string().min(1),
-  roles: z.array(z.string().min(1)).min(1),
+  roles: stringList().pipe(z.array(z.string().min(1)).min(1, 'add at least one role')),
   bio: z.string().min(1),
   location: z.string().default(''),
   email: z.string().email(),
@@ -85,10 +118,10 @@ export const experienceSchema = z.object({
   start: dateish,
   end: optionalish(dateish),
   current: z.boolean().default(false),
-  bullets: z.array(z.string().min(1)).default([]),
-  tech: z.array(z.string().min(1)).default([]),
+  bullets: stringList(),
+  tech: stringList(),
   logo: optionalish(z.string()),
-  order: z.number().default(0),
+  order: orderField,
   body: z.string().default(''),
 })
 
@@ -97,14 +130,14 @@ export const projectSchema = z.object({
   title: z.string().min(1),
   summary: z.string().min(1),
   body: z.string().default(''),
-  tech: z.array(z.string().min(1)).default([]),
+  tech: stringList(),
   repo: optionalish(z.string().url()),
   demo: optionalish(z.string().url()),
   cover: optionalish(z.string()),
   coverAlt: optionalish(z.string()),
   featured: z.boolean().default(false),
   date: dateish,
-  order: z.number().default(0),
+  order: orderField,
 })
 
 export const articleSchema = z.object({
@@ -114,7 +147,7 @@ export const articleSchema = z.object({
   body: z.string().default(''),
   cover: optionalish(z.string()),
   coverAlt: optionalish(z.string()),
-  tags: z.array(z.string().min(1)).default([]),
+  tags: stringList(),
   date: dateish,
   draft: z.boolean().default(false),
   source: z.enum(['native', 'medium']).default('native'),
@@ -125,7 +158,7 @@ export const articleSchema = z.object({
 
 export const skillGroupSchema = z.object({
   label: z.string().min(1),
-  items: z.array(z.string().min(1)).default([]),
+  items: stringList(),
 })
 
 export const skillsSchema = z.object({
@@ -139,8 +172,8 @@ export const educationSchema = z.object({
   location: z.string().default(''),
   start: dateish,
   end: optionalish(dateish),
-  details: z.array(z.string().min(1)).default([]),
-  order: z.number().default(0),
+  details: stringList(),
+  order: orderField,
   body: z.string().default(''),
 })
 
@@ -151,8 +184,8 @@ export const responsibilitySchema = z.object({
   location: z.string().default(''),
   start: dateish,
   end: optionalish(dateish),
-  bullets: z.array(z.string().min(1)).default([]),
-  order: z.number().default(0),
+  bullets: stringList(),
+  order: orderField,
   body: z.string().default(''),
 })
 
@@ -163,7 +196,7 @@ export const customItemSchema = z.object({
   description: optionalish(z.string()),
   image: optionalish(z.string()),
   imageAlt: optionalish(z.string()),
-  tags: z.array(z.string().min(1)).default([]),
+  tags: stringList(),
   links: z.array(linkSchema).default([]),
 })
 
@@ -172,7 +205,7 @@ export const customSectionSchema = z.object({
   title: z.string().min(1),
   layout: z.enum(['cards', 'timeline', 'list', 'logo-grid']).default('cards'),
   items: z.array(customItemSchema).default([]),
-  order: z.number().default(0),
+  order: orderField,
   body: z.string().default(''),
 })
 

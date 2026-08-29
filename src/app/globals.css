@@ -130,3 +130,20 @@ html {
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Scroll-reveal leaves off-screen sections at opacity 0 until they enter the
+ * viewport. Printing renders the whole document unscrolled, so without this a
+ * printed or PDF-exported copy comes out blank below the fold — a plausible
+ * thing for a recruiter to do with a portfolio.
+ */
+@media print {
+  [data-testid='reveal'] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  body::before {
+    display: none;
+  }
+}
