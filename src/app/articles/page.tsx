@@ -19,23 +19,24 @@ export default function ArticlesPage() {
   return (
     <>
       <TopBar settings={getSettings()} variant="sub" />
-      <main className="mx-auto w-full max-w-5xl px-6 py-20 sm:py-28">
+      {/* Same container and type scale as /work — the two sub-pages are peers
+          and reading like different sites is what made them feel unfinished. */}
+      <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <header className="mb-12 max-w-2xl">
-        <h1 className="text-4xl font-semibold tracking-tight text-[color:var(--foreground)] text-balance sm:text-5xl">
-          Writing
-        </h1>
-        <p className="mt-4 text-lg leading-8 text-[color:var(--foreground)]/70 text-pretty">
-          Notes on the things I build — architecture, trade-offs, and the occasional
+        <p className="eyebrow">Writing</p>
+        <h1 className="display mt-4 text-balance text-[var(--foreground)]">Notes</h1>
+        <p className="mt-4 text-[15px] leading-relaxed text-pretty text-[var(--muted)]">
+          On the things I build — architecture, trade-offs, and the occasional
           detour.
         </p>
       </header>
 
       {articles.length === 0 ? (
-        <p className="text-[color:var(--foreground)]/70">
+        <p className="text-[var(--muted)]">
           Nothing published yet. Check back soon.
         </p>
       ) : (
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-5 sm:grid-cols-2">
           {articles.map((article) => (
             <li key={article.slug} className="h-full">
               <ArticleCard article={article} />
@@ -44,12 +45,18 @@ export default function ArticlesPage() {
         </ul>
       )}
 
-      <p className="mt-14">
+      <p className="mt-16 border-t border-[var(--hairline)] pt-8">
         <Link
           href="/"
-          className="text-sm font-medium text-[color:var(--accent-readable)] underline underline-offset-4 decoration-[color:var(--accent)]/40 hover:decoration-[color:var(--accent)]"
+          className="group inline-flex items-center gap-2 text-sm text-[var(--accent-readable)] transition-colors duration-200 motion-reduce:transition-none"
         >
-          ← Back home
+          <span
+            aria-hidden="true"
+            className="transition-transform duration-200 group-hover:-translate-x-1 motion-reduce:transition-none"
+          >
+            ←
+          </span>
+          Back home
         </Link>
       </p>
     </main>

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import TopBar from '@/components/TopBar'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProjects, getSettings } from '@/content'

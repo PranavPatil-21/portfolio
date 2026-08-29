@@ -30,10 +30,17 @@ const SCROLL_THRESHOLD = 8
 export default function TopBar({
   settings,
   variant = 'home',
+  showWriting = true,
   sections,
 }: {
   settings: Settings
   variant?: 'home' | 'sub'
+  /**
+   * Hidden when nothing is published. A nav link to an empty page costs more
+   * trust than a missing link does — the reader assumes the site is unfinished
+   * rather than that the section is simply empty.
+   */
+  showWriting?: boolean
   /**
    * In-page anchors for the mobile panel. Only the home page has any; when it
    * is omitted the mobile trigger is omitted too — a menu offering nothing the
@@ -95,9 +102,11 @@ export default function TopBar({
             <Link href="/work" className={navLink}>
               Work
             </Link>
-            <Link href="/articles" className={navLink}>
-              Writing
-            </Link>
+            {showWriting ? (
+              <Link href="/articles" className={navLink}>
+                Writing
+              </Link>
+            ) : null}
           </nav>
 
           {/*

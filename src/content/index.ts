@@ -10,7 +10,6 @@ import {
   customSectionSchema,
   layoutSchema,
   metricsSchema,
-  architectureSchema,
 } from './schemas'
 import type {
   Settings,
@@ -23,7 +22,6 @@ import type {
   CustomSection,
   LayoutEntry,
   Metric,
-  Architecture,
 } from './schemas'
 
 export * from './schemas'
@@ -78,16 +76,6 @@ export function getMetrics(): Metric[] {
     return readJson('metrics.json', metricsSchema).items
   } catch {
     return []
-  }
-}
-
-/** The system map. Absent file is valid — the section simply omits. */
-export function getArchitecture(): Architecture | null {
-  try {
-    const architecture = readJson('architecture.json', architectureSchema)
-    return architecture.enabled && architecture.nodes.length > 0 ? architecture : null
-  } catch {
-    return null
   }
 }
 

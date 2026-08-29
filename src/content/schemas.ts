@@ -274,59 +274,6 @@ export const customSectionSchema = z.object({
 })
 
 
-/**
- * A system, described the way it would be defended in an interview.
- *
- * Each node answers the four questions that separate someone who built a system
- * from someone who can only name its parts: what it does, why it exists at all,
- * what was traded away to get it, and what breaks without it.
- */
-export const architectureNodeSchema = z.object({
-  id: z.string().min(1),
-  label: z.string().min(1),
-  kind: z.enum(['entry', 'stream', 'service', 'store', 'external']).default('service'),
-  does: z.string().min(1),
-  why: z.string().min(1),
-  tradeoff: optionalish(z.string()),
-  failure: optionalish(z.string()),
-  scale: optionalish(z.string()),
-})
-
-export const architectureEdgeSchema = z.object({
-  from: z.string().min(1),
-  to: z.string().min(1),
-  label: optionalish(z.string()),
-})
-
-/**
- * A path through the system for one real situation.
- *
- * The map alone shows what exists; a journey shows what *happens* — and the
- * product decision taken at each hop. This is the difference between naming
- * components and demonstrating you understand the product they serve.
- */
-export const journeyStepSchema = z.object({
-  node: z.string().min(1),
-  what: z.string().min(1),
-  decision: optionalish(z.string()),
-})
-
-export const journeySchema = z.object({
-  id: z.string().min(1),
-  label: z.string().min(1),
-  summary: optionalish(z.string()),
-  steps: z.array(journeyStepSchema).default([]),
-})
-
-export const architectureSchema = z.object({
-  enabled: z.boolean().default(false),
-  title: z.string().default(''),
-  intro: z.string().default(''),
-  nodes: z.array(architectureNodeSchema).default([]),
-  edges: z.array(architectureEdgeSchema).default([]),
-  journeys: z.array(journeySchema).default([]),
-})
-
 export const layoutEntrySchema = z.object({
   sectionId: z.string().min(1),
   visible: z.boolean().default(true),
@@ -347,10 +294,5 @@ export type Responsibility = z.infer<typeof responsibilitySchema>
 export type CustomItem = z.infer<typeof customItemSchema>
 export type CustomSection = z.infer<typeof customSectionSchema>
 export type Metric = z.infer<typeof metricSchema>
-export type ArchitectureNode = z.infer<typeof architectureNodeSchema>
-export type ArchitectureEdge = z.infer<typeof architectureEdgeSchema>
-export type JourneyStep = z.infer<typeof journeyStepSchema>
-export type Journey = z.infer<typeof journeySchema>
-export type Architecture = z.infer<typeof architectureSchema>
 export type LayoutEntry = z.infer<typeof layoutEntrySchema>
 export type Link = z.infer<typeof linkSchema>

@@ -48,11 +48,15 @@ const projects: Project[] = [
   project({ slug: 'gamma', title: 'Gamma', order: 3, category: 'product' }),
 ]
 
-const state: { projects: Project[] } = { projects }
+const state: { projects: Project[]; articles: unknown[] } = { projects, articles: [] }
 
 vi.mock('@/content', () => ({
   getProjects: () => state.projects,
   getSettings: () => settings,
+  // The page reads this to decide whether the Writing nav link is worth
+  // showing — an empty articles page behind a nav link reads as an unfinished
+  // site rather than an empty section.
+  getNativeArticles: () => state.articles,
 }))
 
 vi.mock('@/lib/markdown', () => ({

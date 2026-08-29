@@ -8,7 +8,6 @@ import {
   getNativeArticles,
   getCustomSections,
   getMetrics,
-  getArchitecture,
   getLayout,
 } from '@/content'
 import { fetchMediumArticles } from '@/lib/medium'
@@ -53,7 +52,6 @@ export default async function Home() {
   const education = getEducation()
   const responsibilities = getResponsibilities()
   const metrics = getMetrics()
-  const architecture = getArchitecture()
 
   /*
    * Sections listed in the layout that will render nothing, because their
@@ -70,7 +68,6 @@ export default async function Home() {
   if (!education.length) emptyIds.add('education')
   if (!responsibilities.length) emptyIds.add('responsibilities')
   if (!metrics.length) emptyIds.add('metrics')
-  if (!architecture) emptyIds.add('architecture')
   for (const section of customSections) {
     if (!section.items.length) emptyIds.add(`custom:${section.slug}`)
   }
@@ -84,7 +81,6 @@ export default async function Home() {
   const SECTION_LABELS: Record<string, string> = {
     current: 'Current role',
     metrics: 'Impact',
-    architecture: 'System',
     experience: 'Experience',
     projects: 'Case studies',
     skills: 'Skills',
@@ -145,7 +141,12 @@ export default async function Home() {
   return (
     <>
       <ScrollProgress />
-      <TopBar settings={settings} variant="home" sections={navSections} />
+      <TopBar
+        settings={settings}
+        variant="home"
+        sections={navSections}
+        showWriting={articles.length > 0}
+      />
       <Spotlight />
       <CommandPalette items={commandItems} />
 
@@ -154,7 +155,7 @@ export default async function Home() {
         evidence scrolls on the right. On narrow screens the rail simply stacks
         above the content.
       */}
-      <div className="flex min-h-screen flex-col gap-4 px-6 py-16 sm:px-10 lg:grid lg:grid-cols-[minmax(22rem,34rem)_minmax(0,1fr)] lg:gap-0 lg:px-0 lg:py-0">
+      <div className="flex min-h-screen flex-col gap-4 px-6 pt-8 pb-16 sm:px-10 lg:grid lg:grid-cols-[minmax(22rem,34rem)_minmax(0,1fr)] lg:gap-0 lg:px-0 lg:py-0">
         <SideRail settings={settings} layout={layout} emptyIds={emptyIds} />
 
         {/*
@@ -165,7 +166,7 @@ export default async function Home() {
         */}
         <main
           id="main"
-          className="relative z-10 min-w-0 pt-6 lg:border-l lg:border-[var(--hairline)] lg:bg-[var(--surface)] lg:py-24 lg:pr-12 lg:pl-14 xl:pr-20 xl:pl-20"
+          className="relative z-10 min-w-0 pt-6 lg:border-l lg:border-[var(--hairline)] lg:bg-[var(--surface)] lg:pt-10 lg:pr-12 lg:pb-24 lg:pl-14 xl:pr-20 xl:pl-20"
         >
           <SectionRenderer
             layout={layout}
@@ -178,7 +179,6 @@ export default async function Home() {
               responsibilities,
               articles,
               metrics,
-              architecture,
               customSections,
             }}
           />

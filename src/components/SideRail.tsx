@@ -8,7 +8,6 @@ import ThemeToggle from '@/components/ThemeToggle'
 const LABELS: Record<string, string> = {
   current: 'Current role',
   metrics: 'Impact',
-  architecture: 'System',
   experience: 'Experience',
   projects: 'Projects',
   skills: 'Skills',
@@ -94,7 +93,7 @@ export default function SideRail({
   const positioning = headline?.trim() ? headline : (bio.split(/(?<=\.)\s/)[0] ?? bio)
 
   return (
-    <header className="min-w-0 lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:flex-col lg:justify-between lg:py-24 lg:pr-12 lg:pl-10 xl:pl-16">
+    <header className="min-w-0 lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:flex-col lg:justify-between lg:pt-10 lg:pr-12 lg:pb-16 lg:pl-10 xl:pl-16">
       <div>
         {location || roles[0] ? (
           <p className="eyebrow mb-5 flex items-center gap-2.5">

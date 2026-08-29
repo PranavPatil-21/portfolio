@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import TopBar from '@/components/TopBar'
 import Link from 'next/link'
-import { getProjects, getSettings } from '@/content'
+import { getNativeArticles, getProjects, getSettings } from '@/content'
 import type { Project } from '@/content'
 import Tag from '@/components/ui/Tag'
 import { formatProjectDate } from './date'
@@ -83,8 +83,8 @@ export default function WorkPage() {
 
   return (
     <>
-      <TopBar settings={getSettings()} variant="sub" />
-      <main id="main" className="mx-auto w-full max-w-3xl px-6 py-20 sm:py-28">
+      <TopBar settings={getSettings()} variant="sub" showWriting={getNativeArticles().length > 0} />
+      <main id="main" className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <header className="max-w-2xl">
         <p className="eyebrow">Case studies</p>
         <h1 className="display mt-4 text-balance text-[var(--foreground)]">Work</h1>

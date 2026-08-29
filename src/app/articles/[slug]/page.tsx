@@ -61,15 +61,15 @@ export default async function ArticlePage({
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-20 sm:py-28">
       <article>
-        <header className="mb-12 border-b border-[color:var(--foreground)]/10 pb-10">
-          <p className="text-xs uppercase tracking-wider text-[color:var(--foreground)]/55">
+        <header className="mb-12 border-b border-[var(--hairline)] pb-10">
+          <p className="text-xs uppercase tracking-wider text-[var(--subtle)]">
             <time dateTime={article.date}>{formatArticleDate(article.date)}</time>
           </p>
-          <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-tight text-[color:var(--foreground)] text-balance sm:text-5xl">
+          <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-tight text-[var(--foreground)] text-balance sm:text-5xl">
             {article.title}
           </h1>
           {article.excerpt ? (
-            <p className="mt-5 text-lg leading-8 text-[color:var(--foreground)]/70 text-pretty">
+            <p className="mt-5 text-lg leading-8 text-[var(--muted)] text-pretty">
               {article.excerpt}
             </p>
           ) : null}
@@ -83,13 +83,13 @@ export default async function ArticlePage({
             </ul>
           ) : null}
           {article.canonicalUrl ? (
-            <p className="mt-6 text-sm text-[color:var(--foreground)]/60">
+            <p className="mt-6 text-sm text-[var(--subtle)]">
               Originally published at{' '}
               <a
                 href={article.canonicalUrl}
                 target="_blank"
                 rel="noopener noreferrer canonical"
-                className="text-[color:var(--accent-readable)] underline underline-offset-4"
+                className="text-[var(--accent-readable)] underline underline-offset-4"
               >
                 the original source
               </a>
@@ -101,10 +101,10 @@ export default async function ArticlePage({
         <MarkdownBody content={article.body} />
       </article>
 
-      <p className="mt-16 border-t border-[color:var(--foreground)]/10 pt-8">
+      <p className="mt-16 border-t border-[var(--hairline)] pt-8">
         <Link
           href="/articles"
-          className="text-sm font-medium text-[color:var(--accent-readable)] underline underline-offset-4 decoration-[color:var(--accent)]/40 hover:decoration-[color:var(--accent)]"
+          className="text-sm font-medium text-[var(--accent-readable)] underline underline-offset-4 decoration-[var(--accent)]/40 hover:decoration-[var(--accent)]"
         >
           ← All articles
         </Link>
