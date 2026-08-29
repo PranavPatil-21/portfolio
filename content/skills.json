@@ -1,0 +1,8 @@
+{
+  "groups": [
+    { "label": "Languages", "items": ["Java", "C/C++", "SQL"] },
+    { "label": "Frameworks & Tools", "items": ["Spring Boot", "FastAPI", "LangGraph", "Kafka", "Docker", "Kubernetes", "Redis", "Git", "Azure"] },
+    { "label": "Databases", "items": ["PostgreSQL", "MongoDB", "MySQL"] },
+    { "label": "Core Concepts", "items": ["Data Structures & Algorithms", "OOP", "Operating Systems", "DBMS", "Computer Networks", "System Design", "LLMs", "RAG"] }
+  ]
+}
