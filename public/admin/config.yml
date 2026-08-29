@@ -16,6 +16,10 @@ backend:
   name: github
   repo: PranavPatil-21/portfolio
   branch: main
+  # The OAuth broker. It lives in this same app (src/app/auth + src/app/callback)
+  # rather than a separate service, so there is one deployment and one place
+  # secrets are configured. Sveltia appends /auth and /callback to this.
+  base_url: https://pranavpatil21.vercel.app
 
 media_folder: public/uploads
 public_folder: /uploads
