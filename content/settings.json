@@ -34,7 +34,7 @@
     "accent": "#ff8c42",
     "background": "#0c0a09",
     "foreground": "#f5f2ef",
-    "defaultMode": "system",
+    "defaultMode": "dark",
     "light": {
       "accent": "#b03d09",
       "background": "#fbfaf8",

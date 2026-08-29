@@ -101,7 +101,7 @@ export default function TopBar({
         <div className="flex items-center gap-2 sm:gap-4">
           {/* In the bar rather than the rail: the rail only exists on the home
               page, so the control was unreachable everywhere else. */}
-          <ThemeToggle />
+          <ThemeToggle defaultMode={settings.theme.defaultMode} />
           <nav aria-label="Site" className="hidden items-center gap-4 sm:flex">
             <Link href="/work" className={navLink}>
               Work

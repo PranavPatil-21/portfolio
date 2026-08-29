@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 export type Mode = 'light' | 'dark'
+export type Fallback = 'light' | 'dark' | 'system'
 
 const STORAGE_KEY = 'theme'
 
@@ -36,8 +37,12 @@ function writeStored(value: string) {
  * decision before React exists — if the two disagree, the page paints one theme
  * and visibly swaps to the other.
  */
-export function resolveTheme(stored: string | null): Mode {
+export function resolveTheme(stored: string | null, fallback: Fallback = 'system'): Mode {
+  // A stored choice always wins — the reader has spoken.
   if (stored === 'light' || stored === 'dark') return stored
+  // Otherwise the CMS decides: an explicit dark/light default overrides the
+  // operating system, and 'system' defers to it.
+  if (fallback === 'light' || fallback === 'dark') return fallback
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'dark'
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
 }
@@ -53,20 +58,29 @@ export function resolveTheme(stored: string | null): Mode {
  * Until first use, no preference is stored and the OS decides. After it, the
  * choice sticks; clearing site data returns to following the system.
  */
-export default function ThemeToggle({ className = '' }: { className?: string }) {
+export default function ThemeToggle({
+  className = '',
+  defaultMode = 'system',
+}: {
+  className?: string
+  /** From the CMS. 'system' follows the OS; 'light'/'dark' override it. */
+  defaultMode?: Fallback
+}) {
   const [mode, setMode] = useState<Mode>('dark')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    setMode(resolveTheme(readStored()))
-  }, [])
+    setMode(resolveTheme(readStored(), defaultMode))
+  }, [defaultMode])
 
   // Keep following the OS while the reader has not chosen, including if they
   // change it in another window with this page open.
   useEffect(() => {
     if (!mounted || typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
-    if (readStored()) return
+    // Only track the OS when nothing overrides it — neither a stored choice
+    // nor an explicit CMS default.
+    if (readStored() || defaultMode !== 'system') return
     const query = window.matchMedia('(prefers-color-scheme: light)')
     const onChange = () => {
       const next: Mode = query.matches ? 'light' : 'dark'
@@ -75,7 +89,7 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
     }
     query.addEventListener?.('change', onChange)
     return () => query.removeEventListener?.('change', onChange)
-  }, [mounted])
+  }, [mounted, defaultMode])
 
   const toggle = () => {
     const next: Mode = mode === 'dark' ? 'light' : 'dark'
