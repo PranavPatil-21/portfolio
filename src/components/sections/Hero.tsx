@@ -18,9 +18,17 @@ export default function Hero({ settings }: { settings: Settings }) {
     >
       <HeroCanvas enabled={features.hero3d} />
 
-      <div className="pointer-events-none absolute inset-0 -z-0 bg-gradient-to-b from-transparent via-transparent to-[var(--background)]" />
+      {/*
+        Two scrims. The horizontal one keeps the copy on a dark base no matter
+        what the scene does behind it — text legibility cannot depend on where a
+        procedurally-animated object happens to drift. The vertical one blends
+        the canvas into the next section.
+      */}
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-[var(--background)] via-[var(--background)]/95 to-[var(--background)]/55 sm:via-[var(--background)]/85 sm:to-transparent" />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[var(--background)]/60 via-transparent to-[var(--background)]" />
 
-      <div className="relative z-10 mx-auto w-full max-w-3xl">
+      <div className="relative z-10 mx-auto w-full max-w-5xl">
+        <div className="max-w-2xl">
         {/*
           Deliberately understated: a small avatar that establishes a face
           without becoming the subject of the hero. The 3D scene is the focal
@@ -85,6 +93,7 @@ export default function Hero({ settings }: { settings: Settings }) {
               {social.label}
             </a>
           ))}
+        </div>
         </div>
       </div>
     </section>

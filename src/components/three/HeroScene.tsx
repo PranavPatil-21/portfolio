@@ -55,7 +55,7 @@ function Particles({ accent, count }: { accent: string; count: number }) {
         const phi = Math.acos(2 * Math.random() - 1)
         return {
           base: new Vector3(
-            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.sin(phi) * Math.cos(theta) + 1.1,
             radius * Math.sin(phi) * Math.sin(theta) * 0.62,
             radius * Math.cos(phi),
           ),
@@ -149,15 +149,20 @@ function Blob({ accent, active }: { accent: string; active: boolean }) {
   })
 
   return (
-    <Icosahedron ref={meshRef} args={[1.35, 12]}>
+    // Offset to the right and pushed back, so it frames the copy instead of
+    // sitting behind it. Centred, it flattened the headline and the bio into an
+    // unreadable wash — the scene is the backdrop, not the subject.
+    <Icosahedron ref={meshRef} args={[1.15, 12]} position={[2.15, 0.2, -0.9]}>
       <MeshDistortMaterial
         color={accent}
-        distort={active ? 0.42 : 0.22}
-        speed={active ? 1.6 : 0}
-        roughness={0.25}
-        metalness={0.65}
+        distort={active ? 0.45 : 0.22}
+        speed={active ? 1.4 : 0}
+        // High roughness and low metalness let the lights model the surface.
+        // The previous metallic + emissive combination blew out to a flat disc.
+        roughness={0.62}
+        metalness={0.15}
         emissive={new Color(accent)}
-        emissiveIntensity={0.18}
+        emissiveIntensity={0.16}
       />
     </Icosahedron>
   )
@@ -181,9 +186,12 @@ export default function HeroScene({
       gl={{ antialias: false, powerPreference: 'high-performance', alpha: true }}
       style={{ pointerEvents: 'none' }}
     >
-      <ambientLight intensity={0.6} />
-      <pointLight position={[4, 4, 5]} intensity={45} color={accent} />
-      <pointLight position={[-5, -3, 2]} intensity={18} color="#ffffff" />
+      {/* Low ambient plus a strong key and a cool rim: the form has to be read
+          from shading, since the object is a single flat-tinted colour. */}
+      <ambientLight intensity={0.4} />
+      <pointLight position={[5, 3.5, 3]} intensity={110} color="#ffffff" />
+      <pointLight position={[-2, -2.5, 2]} intensity={28} color={accent} />
+      <pointLight position={[3.5, -1, -3]} intensity={65} color={accent} />
       <Blob accent={accent} active={!reduced} />
       <Particles accent={accent} count={reduced ? Math.min(count, 300) : count} />
     </Canvas>
