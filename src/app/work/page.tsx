@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { getNativeArticles, getProjects, getSettings } from '@/content'
 import type { Project } from '@/content'
 import Tag from '@/components/ui/Tag'
+import Reveal from '@/components/ui/Reveal'
+import FlowDiagram from '@/components/FlowDiagram'
 import { formatProjectDate } from './date'
 
 /**
@@ -37,38 +39,82 @@ export function generateMetadata(): Metadata {
   }
 }
 
-function CaseStudyRow({ project }: { project: Project }) {
+function CaseStudyRow({ project, index }: { project: Project; index: number }) {
+  /*
+   * Deliberately not one big <Link>. These rows carry a pipeline diagram and a
+   * metric strip, and burying those inside an anchor makes a link whose
+   * accessible name is the entire card. The heading carries the link and a
+   * stretched pseudo-element makes the whole row clickable.
+   */
   return (
     <li>
-      <Link
-        href={`/work/${project.slug}`}
-        className="group -mx-4 block rounded-xl px-4 py-6 transition-colors hover:bg-[var(--surface)]"
-      >
-        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <h3 className="text-lg font-semibold tracking-tight text-[var(--foreground)] transition-colors group-hover:text-[var(--accent-readable)]">
-            {project.title}
-          </h3>
-          <time className="eyebrow tabular" dateTime={project.date}>
-            {formatProjectDate(project.date)}
-          </time>
-        </div>
+      <Reveal delay={index * 0.04}>
+        <article className="group relative -mx-4 rounded-xl px-4 py-6 transition-colors duration-300 hover:bg-[var(--surface)] motion-reduce:transition-none">
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <span
+              aria-hidden="true"
+              className="tabular font-mono text-[11px] text-[var(--subtle)] transition-colors duration-300 group-hover:text-[var(--accent-readable)] motion-reduce:transition-none"
+            >
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <h3 className="text-lg font-semibold tracking-tight text-[var(--foreground)] transition-colors duration-300 group-hover:text-[var(--accent-readable)] motion-reduce:transition-none">
+              <Link href={`/work/${project.slug}`} className="after:absolute after:inset-0">
+                {project.title}
+              </Link>
+            </h3>
+            <time className="eyebrow tabular" dateTime={project.date}>
+              {formatProjectDate(project.date)}
+            </time>
+          </div>
 
-        {project.context ? (
-          <p className="mt-1 text-xs text-[var(--subtle)]">{project.context}</p>
-        ) : null}
+          {project.context ? (
+            <p className="mt-1 text-xs text-[var(--subtle)]">{project.context}</p>
+          ) : null}
 
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-pretty text-[var(--muted)]">
-          {project.summary}
-        </p>
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-pretty text-[var(--muted)]">
+            {project.summary}
+          </p>
 
-        {project.tech.length > 0 ? (
-          <span className="mt-4 flex flex-wrap gap-2">
-            {project.tech.slice(0, 6).map((item) => (
-              <Tag key={item}>{item}</Tag>
-            ))}
-          </span>
-        ) : null}
-      </Link>
+          {/* The numbers, where the work has them — the fastest thing to scan. */}
+          {project.metrics.length > 0 ? (
+            <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-3">
+              {project.metrics.map((metric) => (
+                <div key={`${metric.value}-${metric.label}`}>
+                  <dd className="tabular text-xl leading-none font-semibold tracking-tight text-[var(--accent-readable)]">
+                    {metric.value}
+                  </dd>
+                  <dt className="mt-1 text-xs text-[var(--subtle)]">{metric.label}</dt>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
+          {/* The shape of the system, where the case study describes one. */}
+          {project.flow.length > 1 ? (
+            <div className="mt-5">
+              <FlowDiagram nodes={project.flow} />
+            </div>
+          ) : null}
+
+          {project.tech.length > 0 ? (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {project.tech.slice(0, 6).map((item) => (
+                <Tag key={item}>{item}</Tag>
+              ))}
+            </div>
+          ) : null}
+
+          <p className="mt-5 flex items-center gap-2 text-[13px] text-[var(--accent-readable)]">
+            Read case study
+            <span
+              aria-hidden="true"
+              className="transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
+            >
+              →
+            </span>
+          </p>
+        </article>
+      </Reveal>
     </li>
   )
 }
@@ -110,8 +156,8 @@ export default function WorkPage() {
                 <p className="mt-2 text-sm text-[var(--subtle)]">{group.blurb}</p>
               </div>
               <ul className="mt-2 divide-y divide-[var(--hairline)]">
-                {group.items.map((project) => (
-                  <CaseStudyRow key={project.slug} project={project} />
+                {group.items.map((project, i) => (
+                  <CaseStudyRow key={project.slug} project={project} index={i} />
                 ))}
               </ul>
             </section>

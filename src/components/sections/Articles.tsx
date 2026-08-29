@@ -149,7 +149,13 @@ function ArticleRow({ article }: { article: Article }) {
 
         <span
           aria-hidden="true"
-          className="mt-3 inline-block text-[13px] text-[var(--accent-readable)] opacity-0 transition-opacity duration-200 group-hover:opacity-100 motion-reduce:opacity-100 motion-reduce:transition-none"
+          /*
+           * Always visible, strengthening on hover — not revealed by it. A cue
+           * that only exists on hover is invisible on every touch device, and
+           * invisible entirely without JavaScript, which is where a crawler and
+           * the no-JS test both find it.
+           */
+          className="mt-3 inline-block text-[13px] text-[var(--accent-readable)] opacity-70 transition-opacity duration-200 group-hover:opacity-100 motion-reduce:transition-none"
         >
           {external ? 'Read on Medium →' : 'Read article →'}
         </span>
