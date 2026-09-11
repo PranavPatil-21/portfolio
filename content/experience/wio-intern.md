@@ -5,7 +5,7 @@ location: Remote, India
 start: 2024-02
 end: 2024-08
 current: false
-order: 2
+order: 3
 tech: [Java, Spring Boot, REST APIs, MySQL]
 bullets:
   - "Halved underwriting validation latency (*50%*) with a deduplication service shipped into the production underwriting pipeline."
